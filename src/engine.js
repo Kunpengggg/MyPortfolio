@@ -1,4 +1,4 @@
-import { assetClasses, correlation } from "./data.js";
+import { assetClasses, groupCorrelation } from "./data.js";
 
 const byId = Object.fromEntries(assetClasses.map((asset) => [asset.id, asset]));
 
@@ -61,7 +61,7 @@ export function portfolioStats(weights) {
         fullWeights[right.id] *
         byId[left.id].volatility *
         byId[right.id].volatility *
-        (correlation[left.id]?.[right.id] ?? 0.3);
+        correlationFor(left, right);
     }
   }
 
@@ -71,6 +71,11 @@ export function portfolioStats(weights) {
     volatility,
     score: volatility > 0 ? expectedReturn / volatility : 0
   };
+}
+
+function correlationFor(left, right) {
+  if (left.id === right.id) return 1;
+  return groupCorrelation[left.group]?.[right.group] ?? groupCorrelation[right.group]?.[left.group] ?? 0.3;
 }
 
 export function rebalanceRows(assets, targetWeights) {

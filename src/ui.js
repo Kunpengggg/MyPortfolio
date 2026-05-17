@@ -11,7 +11,7 @@ import {
 import { clearSnapshots, deleteSnapshot, loadSnapshots, saveSnapshot } from "./store.js";
 
 const state = {
-  assets: { ...emptyAssets },
+  assets: createEmptyAssets(),
   portfolioId: "cnBalanced",
   snapshots: loadSnapshots()
 };
@@ -33,6 +33,10 @@ const nodes = {
   portfolioCards: document.querySelector("#portfolioCards"),
   portfolioDescription: document.querySelector("#portfolioDescription"),
   diagnosis: document.querySelector("#diagnosis"),
+  totalPie: document.querySelector("#totalPie"),
+  totalLegend: document.querySelector("#totalLegend"),
+  investablePie: document.querySelector("#investablePie"),
+  investableLegend: document.querySelector("#investableLegend"),
   targetBars: document.querySelector("#targetBars"),
   metrics: document.querySelector("#metrics"),
   riskLabel: document.querySelector("#riskLabel"),
@@ -48,6 +52,23 @@ const nodes = {
   recommendBtn: document.querySelector("#recommendBtn"),
   recommendationResult: document.querySelector("#recommendationResult")
 };
+
+function createEmptyAssets() {
+  return { ...emptyAssets };
+}
+
+function migrateAssets(assets) {
+  const migrated = createEmptyAssets();
+  for (const asset of assetClasses) {
+    migrated[asset.id] = Number(assets?.[asset.id] || 0);
+  }
+
+  if (assets?.chinaEquity && !assets.chinaBroadIndex) {
+    migrated.chinaBroadIndex = Number(assets.chinaEquity || 0);
+  }
+
+  return migrated;
+}
 
 function selectedPortfolio() {
   return portfolios.find((portfolio) => portfolio.id === state.portfolioId) || portfolios[0];
@@ -181,6 +202,66 @@ function renderSummary() {
   renderScenarioTable(targetStats);
 }
 
+function renderPieCharts() {
+  renderPieChart({
+    assets: assetClasses,
+    container: nodes.totalPie,
+    legend: nodes.totalLegend,
+    emptyText: "录入资产后显示家庭总资产结构"
+  });
+
+  renderPieChart({
+    assets: assetClasses.filter((asset) => asset.rebalanceable),
+    container: nodes.investablePie,
+    legend: nodes.investableLegend,
+    emptyText: "录入金融资产后显示可投资结构"
+  });
+}
+
+function renderPieChart({ assets, container, legend, emptyText }) {
+  const rows = assets
+    .map((asset) => ({
+      ...asset,
+      amount: Number(state.assets[asset.id] || 0)
+    }))
+    .filter((asset) => asset.amount > 0);
+  const total = rows.reduce((sum, asset) => sum + asset.amount, 0);
+
+  if (total <= 0) {
+    container.style.background = "#edf0ec";
+    container.setAttribute("aria-label", emptyText);
+    legend.innerHTML = `<div class="empty-state">${emptyText}</div>`;
+    return;
+  }
+
+  let start = 0;
+  const segments = rows.map((asset) => {
+    const percent = asset.amount / total;
+    const end = start + percent * 100;
+    const segment = `${asset.color} ${start.toFixed(3)}% ${end.toFixed(3)}%`;
+    start = end;
+    return segment;
+  });
+
+  container.style.background = `conic-gradient(${segments.join(", ")})`;
+  container.setAttribute(
+    "aria-label",
+    rows.map((asset) => `${asset.name} ${percentFormatter.format(asset.amount / total)}`).join("，")
+  );
+  legend.innerHTML = rows
+    .sort((left, right) => right.amount - left.amount)
+    .map(
+      (asset) => `
+        <div class="legend-row">
+          <span class="legend-dot" style="background: ${asset.color}"></span>
+          <span class="legend-name">${asset.name}</span>
+          <strong>${percentFormatter.format(asset.amount / total)}</strong>
+        </div>
+      `
+    )
+    .join("");
+}
+
 function renderScenarioTable(targetStats) {
   nodes.scenarioTable.innerHTML = `
     <div class="scenario-row"><span>目标组合情景</span><span>收益</span><span>波动</span></div>
@@ -269,7 +350,7 @@ function recommendedPortfolioId() {
   if (horizon === "retirement") return "cnRetirement";
   if (horizon === "short" || goal === "liquidity") return "cnIncome";
   if (drawdown === "low") return "cnStable";
-  if (horizon === "long" && drawdown === "high" && goal === "growth") return "cnGrowth";
+  if (horizon === "long" && drawdown === "high" && goal === "growth") return "cnHighReturn";
   if (goal === "growth" && drawdown !== "low") return "cnGrowth";
   if (goal === "balance" && drawdown === "medium") return "cnBalanced";
   return "cnBalanced";
@@ -311,6 +392,7 @@ function renderHistory() {
 
 function renderAll() {
   renderTarget();
+  renderPieCharts();
   renderSummary();
   renderRebalance();
   renderHistory();
@@ -347,7 +429,7 @@ function bindEvents() {
   });
 
   nodes.resetBtn.addEventListener("click", () => {
-    state.assets = { ...emptyAssets };
+    state.assets = createEmptyAssets();
     renderInputs();
     renderAll();
   });
@@ -364,7 +446,7 @@ function bindEvents() {
     if (loadId) {
       const snapshot = state.snapshots.find((item) => item.id === loadId);
       if (!snapshot) return;
-      state.assets = { ...snapshot.assets };
+      state.assets = migrateAssets(snapshot.assets);
       state.portfolioId = snapshot.portfolioId;
       renderInputs();
       renderPortfolioCards();

@@ -26,7 +26,10 @@ const testAssets = {
   demandCash: 80000,
   moneyFund: 50000,
   bonds: 120000,
-  chinaEquity: 80000,
+  chinaBroadIndex: 55000,
+  dividendStrategy: 25000,
+  sectorFunds: 20000,
+  singleStocks: 10000,
   hkChinaEquity: 30000,
   overseasEquity: 20000,
   gold: 40000,
@@ -36,7 +39,7 @@ const testAssets = {
 };
 
 const totalAssets = sumAssets(testAssets);
-assert.equal(totalAssets, 2330000, "test household asset total should match fixture value");
+assert.equal(totalAssets, 2360000, "test household asset total should match fixture value");
 
 const currentWeights = weightsFromInvestableAssets(testAssets);
 const currentInvestableWeightSum = investableAssetIds.reduce((sum, id) => sum + currentWeights[id], 0);
@@ -54,6 +57,8 @@ for (const portfolio of portfolios) {
 
 const incomeVolatility = portfolioStats(normalizeInvestableTargetWeights(portfolios.find((item) => item.id === "cnIncome").weights)).volatility;
 const growthVolatility = portfolioStats(normalizeInvestableTargetWeights(portfolios.find((item) => item.id === "cnGrowth").weights)).volatility;
+const highReturnVolatility = portfolioStats(normalizeInvestableTargetWeights(portfolios.find((item) => item.id === "cnHighReturn").weights)).volatility;
 assert.ok(incomeVolatility < growthVolatility, "cash-flow portfolio should be less volatile than growth portfolio");
+assert.ok(growthVolatility <= highReturnVolatility, "high-return portfolio should be at least as volatile as growth portfolio");
 
 console.log("engine tests passed");
