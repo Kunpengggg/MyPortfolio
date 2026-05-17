@@ -329,6 +329,10 @@ select {
   font-size: 13px;
 }
 
+.observer-row {
+  grid-template-columns: 86px 1fr 62px;
+}
+
 .bar-track {
   height: 10px;
   overflow: hidden;

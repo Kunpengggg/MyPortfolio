@@ -102,11 +102,13 @@ function renderPortfolioCards() {
 
 function renderTarget() {
   const portfolio = selectedPortfolio();
+  const investableWeights = normalizeInvestableTargetWeights(portfolio.weights);
+  const observerAssets = assetClasses.filter((asset) => !asset.rebalanceable && portfolio.weights[asset.id]);
   nodes.portfolioDescription.textContent = portfolio.description;
   nodes.targetBars.innerHTML = assetClasses
-    .filter((asset) => portfolio.weights[asset.id])
+    .filter((asset) => asset.rebalanceable && investableWeights[asset.id])
     .map((asset) => {
-      const weight = portfolio.weights[asset.id];
+      const weight = investableWeights[asset.id];
       return `
         <div class="bar-row">
           <span>${asset.name}</span>
@@ -115,7 +117,18 @@ function renderTarget() {
         </div>
       `;
     })
-    .join("");
+    .join("") +
+    observerAssets
+      .map(
+        (asset) => `
+          <div class="bar-row observer-row">
+            <span>${asset.name}</span>
+            <span class="muted">观察项，不参与直接调仓</span>
+            <strong>${percentFormatter.format(portfolio.weights[asset.id])}</strong>
+          </div>
+        `
+      )
+      .join("");
 }
 
 function renderSummary() {
@@ -124,7 +137,7 @@ function renderSummary() {
   const targetStats = portfolioStats(normalizeInvestableTargetWeights(selectedPortfolio().weights));
   nodes.totalAssets.textContent = formatter.format(total);
   nodes.riskLabel.textContent = riskLevel(currentStats.volatility);
-  nodes.diagnosis.textContent = diagnosisText(currentStats, targetStats);
+  nodes.diagnosis.textContent = diagnosisText(currentStats, targetStats, state.assets);
 
   nodes.metrics.innerHTML = [
     ["当前预期收益", percentFormatter.format(currentStats.expectedReturn)],
@@ -186,23 +199,29 @@ function renderRebalance() {
     .join("");
 }
 
-function diagnosisText(currentStats, targetStats) {
+function diagnosisText(currentStats, targetStats, assets) {
   const volatilityGap = currentStats.volatility - targetStats.volatility;
   const returnGap = currentStats.expectedReturn - targetStats.expectedReturn;
+  const total = sumAssets(assets);
+  const propertyRatio = total > 0 ? Number(assets.property || 0) / total : 0;
+  const propertyNote =
+    propertyRatio > 0.6
+      ? `另外，房产占总资产 ${percentFormatter.format(propertyRatio)}，这是国内家庭最需要优先观察的集中度风险。`
+      : "";
 
   if (volatilityGap > 0.025) {
-    return `一句话诊断：你的金融资产比当前目标更激进，预期波动高 ${percentFormatter.format(volatilityGap)}。如果这笔钱 3 年内可能用到，优先降低权益和高波动资产。`;
+    return `一句话诊断：你的金融资产比当前目标更激进，预期波动高 ${percentFormatter.format(volatilityGap)}。如果这笔钱 3 年内可能用到，优先降低权益和高波动资产。${propertyNote}`;
   }
 
   if (volatilityGap < -0.025) {
-    return `一句话诊断：你的金融资产比当前目标更保守，预期波动低 ${percentFormatter.format(Math.abs(volatilityGap))}，但长期收益弹性也可能偏低。`;
+    return `一句话诊断：你的金融资产比当前目标更保守，预期波动低 ${percentFormatter.format(Math.abs(volatilityGap))}，但长期收益弹性也可能偏低。${propertyNote}`;
   }
 
   if (returnGap < -0.008) {
-    return `一句话诊断：你的金融资产风险接近目标，但预期收益略低。可以检查现金类和固收类是否占比过高。`;
+    return `一句话诊断：你的金融资产风险接近目标，但预期收益略低。可以检查现金类和固收类是否占比过高。${propertyNote}`;
   }
 
-  return "一句话诊断：你的金融资产和当前目标组合接近，下一步重点是定期记录和小幅再平衡，而不是频繁交易。";
+  return `一句话诊断：你的金融资产和当前目标组合接近，下一步重点是定期记录和小幅再平衡，而不是频繁交易。${propertyNote}`;
 }
 
 function recommendedPortfolioId() {
