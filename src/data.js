@@ -73,20 +73,30 @@ export const assetClasses = [
     id: "hkChinaEquity",
     name: "港股 / 中概",
     hint: "港股通、恒生科技、中概互联",
-    expectedReturn: 0.07,
+    expectedReturn: 0.055,
     volatility: 0.28,
     group: "hkEquity",
     color: "#7759a6",
     rebalanceable: true
   },
   {
-    id: "overseasEquity",
-    name: "海外权益",
-    hint: "QDII、全球/美股指数基金",
-    expectedReturn: 0.055,
+    id: "usEquity",
+    name: "美股 / 标普纳指",
+    hint: "标普500、纳指100、美国全市场 QDII",
+    expectedReturn: 0.075,
     volatility: 0.18,
-    group: "overseasEquity",
+    group: "usEquity",
     color: "#4c78a8",
+    rebalanceable: true
+  },
+  {
+    id: "globalExUsEquity",
+    name: "全球除美权益",
+    hint: "欧洲、日本、印度等非美市场基金",
+    expectedReturn: 0.052,
+    volatility: 0.19,
+    group: "globalExUsEquity",
+    color: "#5f9ea0",
     rebalanceable: true
   },
   {
@@ -142,18 +152,19 @@ export const assetClasses = [
 ];
 
 export const groupCorrelation = {
-  cash: { cash: 1, bonds: 0.18, chinaEquity: 0.03, sectorEquity: 0.03, singleStocks: 0.03, hkEquity: 0.03, overseasEquity: 0.02, gold: 0, reits: 0.05, insurance: 0.12, property: 0.05, other: 0.05 },
-  bonds: { cash: 0.18, bonds: 1, chinaEquity: 0.12, sectorEquity: 0.1, singleStocks: 0.08, hkEquity: 0.1, overseasEquity: 0.08, gold: 0.08, reits: 0.18, insurance: 0.35, property: 0.12, other: 0.12 },
-  chinaEquity: { cash: 0.03, bonds: 0.12, chinaEquity: 1, sectorEquity: 0.75, singleStocks: 0.65, hkEquity: 0.72, overseasEquity: 0.48, gold: 0.05, reits: 0.42, insurance: 0.12, property: 0.28, other: 0.4 },
-  sectorEquity: { cash: 0.03, bonds: 0.1, chinaEquity: 0.75, sectorEquity: 1, singleStocks: 0.72, hkEquity: 0.68, overseasEquity: 0.46, gold: 0.06, reits: 0.4, insurance: 0.1, property: 0.25, other: 0.42 },
-  singleStocks: { cash: 0.03, bonds: 0.08, chinaEquity: 0.65, sectorEquity: 0.72, singleStocks: 1, hkEquity: 0.55, overseasEquity: 0.35, gold: 0.05, reits: 0.28, insurance: 0.08, property: 0.2, other: 0.45 },
-  hkEquity: { cash: 0.03, bonds: 0.1, chinaEquity: 0.72, sectorEquity: 0.68, singleStocks: 0.55, hkEquity: 1, overseasEquity: 0.58, gold: 0.08, reits: 0.38, insurance: 0.1, property: 0.26, other: 0.42 },
-  overseasEquity: { cash: 0.02, bonds: 0.08, chinaEquity: 0.48, sectorEquity: 0.46, singleStocks: 0.35, hkEquity: 0.58, overseasEquity: 1, gold: 0.04, reits: 0.34, insurance: 0.08, property: 0.18, other: 0.35 },
-  gold: { cash: 0, bonds: 0.08, chinaEquity: 0.05, sectorEquity: 0.06, singleStocks: 0.05, hkEquity: 0.08, overseasEquity: 0.04, gold: 1, reits: 0.12, insurance: 0.05, property: 0.1, other: 0.18 },
-  reits: { cash: 0.05, bonds: 0.18, chinaEquity: 0.42, sectorEquity: 0.4, singleStocks: 0.28, hkEquity: 0.38, overseasEquity: 0.34, gold: 0.12, reits: 1, insurance: 0.14, property: 0.5, other: 0.35 },
-  insurance: { cash: 0.12, bonds: 0.35, chinaEquity: 0.12, sectorEquity: 0.1, singleStocks: 0.08, hkEquity: 0.1, overseasEquity: 0.08, gold: 0.05, reits: 0.14, insurance: 1, property: 0.12, other: 0.1 },
-  property: { cash: 0.05, bonds: 0.12, chinaEquity: 0.28, sectorEquity: 0.25, singleStocks: 0.2, hkEquity: 0.26, overseasEquity: 0.18, gold: 0.1, reits: 0.5, insurance: 0.12, property: 1, other: 0.28 },
-  other: { cash: 0.05, bonds: 0.12, chinaEquity: 0.4, sectorEquity: 0.42, singleStocks: 0.45, hkEquity: 0.42, overseasEquity: 0.35, gold: 0.18, reits: 0.35, insurance: 0.1, property: 0.28, other: 1 }
+  cash: { cash: 1, bonds: 0.18, chinaEquity: 0.03, sectorEquity: 0.03, singleStocks: 0.03, hkEquity: 0.03, usEquity: 0.02, globalExUsEquity: 0.02, gold: 0, reits: 0.05, insurance: 0.12, property: 0.05, other: 0.05 },
+  bonds: { cash: 0.18, bonds: 1, chinaEquity: 0.12, sectorEquity: 0.1, singleStocks: 0.08, hkEquity: 0.1, usEquity: 0.08, globalExUsEquity: 0.08, gold: 0.08, reits: 0.18, insurance: 0.35, property: 0.12, other: 0.12 },
+  chinaEquity: { cash: 0.03, bonds: 0.12, chinaEquity: 1, sectorEquity: 0.75, singleStocks: 0.65, hkEquity: 0.72, usEquity: 0.42, globalExUsEquity: 0.48, gold: 0.05, reits: 0.42, insurance: 0.12, property: 0.28, other: 0.4 },
+  sectorEquity: { cash: 0.03, bonds: 0.1, chinaEquity: 0.75, sectorEquity: 1, singleStocks: 0.72, hkEquity: 0.68, usEquity: 0.42, globalExUsEquity: 0.46, gold: 0.06, reits: 0.4, insurance: 0.1, property: 0.25, other: 0.42 },
+  singleStocks: { cash: 0.03, bonds: 0.08, chinaEquity: 0.65, sectorEquity: 0.72, singleStocks: 1, hkEquity: 0.55, usEquity: 0.35, globalExUsEquity: 0.35, gold: 0.05, reits: 0.28, insurance: 0.08, property: 0.2, other: 0.45 },
+  hkEquity: { cash: 0.03, bonds: 0.1, chinaEquity: 0.72, sectorEquity: 0.68, singleStocks: 0.55, hkEquity: 1, usEquity: 0.52, globalExUsEquity: 0.58, gold: 0.08, reits: 0.38, insurance: 0.1, property: 0.26, other: 0.42 },
+  usEquity: { cash: 0.02, bonds: 0.08, chinaEquity: 0.42, sectorEquity: 0.42, singleStocks: 0.35, hkEquity: 0.52, usEquity: 1, globalExUsEquity: 0.72, gold: 0.04, reits: 0.34, insurance: 0.08, property: 0.18, other: 0.35 },
+  globalExUsEquity: { cash: 0.02, bonds: 0.08, chinaEquity: 0.48, sectorEquity: 0.46, singleStocks: 0.35, hkEquity: 0.58, usEquity: 0.72, globalExUsEquity: 1, gold: 0.04, reits: 0.34, insurance: 0.08, property: 0.18, other: 0.35 },
+  gold: { cash: 0, bonds: 0.08, chinaEquity: 0.05, sectorEquity: 0.06, singleStocks: 0.05, hkEquity: 0.08, usEquity: 0.04, globalExUsEquity: 0.04, gold: 1, reits: 0.12, insurance: 0.05, property: 0.1, other: 0.18 },
+  reits: { cash: 0.05, bonds: 0.18, chinaEquity: 0.42, sectorEquity: 0.4, singleStocks: 0.28, hkEquity: 0.38, usEquity: 0.34, globalExUsEquity: 0.34, gold: 0.12, reits: 1, insurance: 0.14, property: 0.5, other: 0.35 },
+  insurance: { cash: 0.12, bonds: 0.35, chinaEquity: 0.12, sectorEquity: 0.1, singleStocks: 0.08, hkEquity: 0.1, usEquity: 0.08, globalExUsEquity: 0.08, gold: 0.05, reits: 0.14, insurance: 1, property: 0.12, other: 0.1 },
+  property: { cash: 0.05, bonds: 0.12, chinaEquity: 0.28, sectorEquity: 0.25, singleStocks: 0.2, hkEquity: 0.26, usEquity: 0.18, globalExUsEquity: 0.18, gold: 0.1, reits: 0.5, insurance: 0.12, property: 1, other: 0.28 },
+  other: { cash: 0.05, bonds: 0.12, chinaEquity: 0.4, sectorEquity: 0.42, singleStocks: 0.45, hkEquity: 0.42, usEquity: 0.35, globalExUsEquity: 0.35, gold: 0.18, reits: 0.35, insurance: 0.1, property: 0.28, other: 1 }
 };
 
 export const portfolios = [
@@ -162,32 +173,32 @@ export const portfolios = [
     name: "国内稳健固收+",
     badge: "更稳",
     fit: "适合不想大幅波动、刚开始从存款转向基金/理财的人。",
-    description: "面向中国普通家庭的低波动组合：保留现金流动性，以债券/固收为核心，用宽基指数、红利和黄金提升长期弹性。",
-    weights: { demandCash: 0.15, moneyFund: 0.1, bonds: 0.45, chinaBroadIndex: 0.1, dividendStrategy: 0.08, overseasEquity: 0.02, gold: 0.1 }
+    description: "面向中国普通家庭的低波动组合：保留现金流动性，以债券/固收为核心，用宽基指数、红利、美股和黄金提升长期弹性。",
+    weights: { demandCash: 0.15, moneyFund: 0.1, bonds: 0.45, chinaBroadIndex: 0.08, dividendStrategy: 0.07, usEquity: 0.05, gold: 0.1 }
   },
   {
     id: "cnBalanced",
     name: "国内均衡配置",
     badge: "默认推荐",
     fit: "适合多数家庭的长期闲钱：希望比存款更有弹性，但不想把权益仓位拉太高。",
-    description: "股债黄金多元配置，权益部分以宽基和红利为核心，少量港股/海外提高分散度。",
-    weights: { demandCash: 0.1, moneyFund: 0.1, bonds: 0.35, chinaBroadIndex: 0.15, dividendStrategy: 0.08, sectorFunds: 0.03, hkChinaEquity: 0.08, overseasEquity: 0.03, gold: 0.08 }
+    description: "股债黄金多元配置，权益部分以 A股宽基、红利和美股为核心，港股/中概降为卫星仓位。",
+    weights: { demandCash: 0.08, moneyFund: 0.08, bonds: 0.32, chinaBroadIndex: 0.14, dividendStrategy: 0.08, sectorFunds: 0.03, hkChinaEquity: 0.03, usEquity: 0.15, globalExUsEquity: 0.02, gold: 0.07 }
   },
   {
     id: "cnGrowth",
     name: "国内进取长期",
     badge: "收益潜力高",
     fit: "适合 5 年以上不用、能接受账户明显上下波动的钱。",
-    description: "提高宽基、红利、行业主题、港股和海外权益占比，追求更高长期收益弹性。",
-    weights: { demandCash: 0.05, moneyFund: 0.05, bonds: 0.22, chinaBroadIndex: 0.22, dividendStrategy: 0.08, sectorFunds: 0.1, singleStocks: 0.03, hkChinaEquity: 0.12, overseasEquity: 0.08, gold: 0.05 }
+    description: "提高宽基、红利、行业主题和美股占比，追求更高长期收益弹性；港股/中概只保留小比例。",
+    weights: { demandCash: 0.04, moneyFund: 0.04, bonds: 0.2, chinaBroadIndex: 0.2, dividendStrategy: 0.08, sectorFunds: 0.08, singleStocks: 0.03, hkChinaEquity: 0.05, usEquity: 0.2, globalExUsEquity: 0.03, gold: 0.05 }
   },
   {
     id: "cnHighReturn",
     name: "长期进取增长",
     badge: "高收益潜力",
     fit: "适合 5-10 年不用、能承受较大回撤，并愿意承担权益集中波动的人。",
-    description: "更重视长期增值，把权益资产作为主体。行业主题和个股只保留小比例，避免把高收益潜力变成单点押注。",
-    weights: { demandCash: 0.03, moneyFund: 0.02, bonds: 0.15, chinaBroadIndex: 0.25, dividendStrategy: 0.1, sectorFunds: 0.15, singleStocks: 0.05, hkChinaEquity: 0.1, overseasEquity: 0.1, gold: 0.05 }
+    description: "更重视长期增值，把美股和宽基权益作为主体。行业主题和个股只保留小比例，避免把高收益潜力变成单点押注。",
+    weights: { demandCash: 0.03, moneyFund: 0.02, bonds: 0.12, chinaBroadIndex: 0.22, dividendStrategy: 0.08, sectorFunds: 0.12, singleStocks: 0.05, hkChinaEquity: 0.05, usEquity: 0.25, globalExUsEquity: 0.03, gold: 0.03 }
   },
   {
     id: "cnIncome",
@@ -202,8 +213,8 @@ export const portfolios = [
     name: "养老长期稳健",
     badge: "养老",
     fit: "适合为养老单独做账户的人，保险/养老金作为长期锁定资产观察。",
-    description: "适合养老储备视角：把稳健资产作为主体，保留养老金/保险观察项，宽基、红利和黄金用于抗通胀与长期增值。",
-    weights: { demandCash: 0.1, moneyFund: 0.1, bonds: 0.35, chinaBroadIndex: 0.12, dividendStrategy: 0.08, overseasEquity: 0.05, gold: 0.05, pensionInsurance: 0.15 }
+    description: "适合养老储备视角：把稳健资产作为主体，保留养老金/保险观察项，宽基、红利、美股和黄金用于抗通胀与长期增值。",
+    weights: { demandCash: 0.1, moneyFund: 0.1, bonds: 0.35, chinaBroadIndex: 0.1, dividendStrategy: 0.08, usEquity: 0.08, globalExUsEquity: 0.02, gold: 0.02, pensionInsurance: 0.15 }
   },
   {
     id: "cnBarbell",
@@ -211,7 +222,7 @@ export const portfolios = [
     badge: "攻守分明",
     fit: "适合想把安全垫和增长仓分得很清楚的人。",
     description: "一端是现金和债券，一端是宽基、红利、主题和黄金，中间少放，适合清晰区分安全垫和增长仓。",
-    weights: { demandCash: 0.15, moneyFund: 0.1, bonds: 0.3, chinaBroadIndex: 0.16, dividendStrategy: 0.08, sectorFunds: 0.04, hkChinaEquity: 0.07, overseasEquity: 0.03, gold: 0.07 }
+    weights: { demandCash: 0.15, moneyFund: 0.1, bonds: 0.3, chinaBroadIndex: 0.14, dividendStrategy: 0.08, sectorFunds: 0.04, hkChinaEquity: 0.03, usEquity: 0.1, gold: 0.06 }
   }
 ];
 

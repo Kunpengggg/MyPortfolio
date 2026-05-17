@@ -30,8 +30,9 @@ const testAssets = {
   dividendStrategy: 25000,
   sectorFunds: 20000,
   singleStocks: 10000,
-  hkChinaEquity: 30000,
-  overseasEquity: 20000,
+  hkChinaEquity: 15000,
+  usEquity: 35000,
+  globalExUsEquity: 10000,
   gold: 40000,
   reits: 10000,
   pensionInsurance: 100000,
@@ -39,7 +40,7 @@ const testAssets = {
 };
 
 const totalAssets = sumAssets(testAssets);
-assert.equal(totalAssets, 2360000, "test household asset total should match fixture value");
+assert.equal(totalAssets, 2370000, "test household asset total should match fixture value");
 
 const currentWeights = weightsFromInvestableAssets(testAssets);
 const currentInvestableWeightSum = investableAssetIds.reduce((sum, id) => sum + currentWeights[id], 0);
@@ -60,5 +61,10 @@ const growthVolatility = portfolioStats(normalizeInvestableTargetWeights(portfol
 const highReturnVolatility = portfolioStats(normalizeInvestableTargetWeights(portfolios.find((item) => item.id === "cnHighReturn").weights)).volatility;
 assert.ok(incomeVolatility < growthVolatility, "cash-flow portfolio should be less volatile than growth portfolio");
 assert.ok(growthVolatility <= highReturnVolatility, "high-return portfolio should be at least as volatile as growth portfolio");
+
+const balanced = portfolios.find((item) => item.id === "cnBalanced");
+const highReturn = portfolios.find((item) => item.id === "cnHighReturn");
+assert.ok(balanced.weights.usEquity > balanced.weights.hkChinaEquity, "balanced portfolio should weight US equity more than HK/China offshore equity");
+assert.ok(highReturn.weights.usEquity > highReturn.weights.hkChinaEquity, "high-return portfolio should weight US equity more than HK/China offshore equity");
 
 console.log("engine tests passed");

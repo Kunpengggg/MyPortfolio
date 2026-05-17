@@ -67,6 +67,10 @@ function migrateAssets(assets) {
     migrated.chinaBroadIndex = Number(assets.chinaEquity || 0);
   }
 
+  if (assets?.overseasEquity && !assets.usEquity) {
+    migrated.usEquity = Number(assets.overseasEquity || 0);
+  }
+
   return migrated;
 }
 
