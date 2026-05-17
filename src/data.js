@@ -83,10 +83,20 @@ export const assetClasses = [
     id: "usEquity",
     name: "美股 / 标普纳指",
     hint: "标普500、纳指100、美国全市场 QDII",
-    expectedReturn: 0.075,
+    expectedReturn: 0.085,
     volatility: 0.18,
     group: "usEquity",
     color: "#4c78a8",
+    rebalanceable: true
+  },
+  {
+    id: "usTechGrowth",
+    name: "美股科技 / 纳指增强",
+    hint: "纳指100、AI、科技成长类基金",
+    expectedReturn: 0.15,
+    volatility: 0.28,
+    group: "usTechGrowth",
+    color: "#2f5597",
     rebalanceable: true
   },
   {
@@ -152,19 +162,20 @@ export const assetClasses = [
 ];
 
 export const groupCorrelation = {
-  cash: { cash: 1, bonds: 0.18, chinaEquity: 0.03, sectorEquity: 0.03, singleStocks: 0.03, hkEquity: 0.03, usEquity: 0.02, globalExUsEquity: 0.02, gold: 0, reits: 0.05, insurance: 0.12, property: 0.05, other: 0.05 },
-  bonds: { cash: 0.18, bonds: 1, chinaEquity: 0.12, sectorEquity: 0.1, singleStocks: 0.08, hkEquity: 0.1, usEquity: 0.08, globalExUsEquity: 0.08, gold: 0.08, reits: 0.18, insurance: 0.35, property: 0.12, other: 0.12 },
-  chinaEquity: { cash: 0.03, bonds: 0.12, chinaEquity: 1, sectorEquity: 0.75, singleStocks: 0.65, hkEquity: 0.72, usEquity: 0.42, globalExUsEquity: 0.48, gold: 0.05, reits: 0.42, insurance: 0.12, property: 0.28, other: 0.4 },
-  sectorEquity: { cash: 0.03, bonds: 0.1, chinaEquity: 0.75, sectorEquity: 1, singleStocks: 0.72, hkEquity: 0.68, usEquity: 0.42, globalExUsEquity: 0.46, gold: 0.06, reits: 0.4, insurance: 0.1, property: 0.25, other: 0.42 },
-  singleStocks: { cash: 0.03, bonds: 0.08, chinaEquity: 0.65, sectorEquity: 0.72, singleStocks: 1, hkEquity: 0.55, usEquity: 0.35, globalExUsEquity: 0.35, gold: 0.05, reits: 0.28, insurance: 0.08, property: 0.2, other: 0.45 },
-  hkEquity: { cash: 0.03, bonds: 0.1, chinaEquity: 0.72, sectorEquity: 0.68, singleStocks: 0.55, hkEquity: 1, usEquity: 0.52, globalExUsEquity: 0.58, gold: 0.08, reits: 0.38, insurance: 0.1, property: 0.26, other: 0.42 },
-  usEquity: { cash: 0.02, bonds: 0.08, chinaEquity: 0.42, sectorEquity: 0.42, singleStocks: 0.35, hkEquity: 0.52, usEquity: 1, globalExUsEquity: 0.72, gold: 0.04, reits: 0.34, insurance: 0.08, property: 0.18, other: 0.35 },
-  globalExUsEquity: { cash: 0.02, bonds: 0.08, chinaEquity: 0.48, sectorEquity: 0.46, singleStocks: 0.35, hkEquity: 0.58, usEquity: 0.72, globalExUsEquity: 1, gold: 0.04, reits: 0.34, insurance: 0.08, property: 0.18, other: 0.35 },
-  gold: { cash: 0, bonds: 0.08, chinaEquity: 0.05, sectorEquity: 0.06, singleStocks: 0.05, hkEquity: 0.08, usEquity: 0.04, globalExUsEquity: 0.04, gold: 1, reits: 0.12, insurance: 0.05, property: 0.1, other: 0.18 },
-  reits: { cash: 0.05, bonds: 0.18, chinaEquity: 0.42, sectorEquity: 0.4, singleStocks: 0.28, hkEquity: 0.38, usEquity: 0.34, globalExUsEquity: 0.34, gold: 0.12, reits: 1, insurance: 0.14, property: 0.5, other: 0.35 },
-  insurance: { cash: 0.12, bonds: 0.35, chinaEquity: 0.12, sectorEquity: 0.1, singleStocks: 0.08, hkEquity: 0.1, usEquity: 0.08, globalExUsEquity: 0.08, gold: 0.05, reits: 0.14, insurance: 1, property: 0.12, other: 0.1 },
-  property: { cash: 0.05, bonds: 0.12, chinaEquity: 0.28, sectorEquity: 0.25, singleStocks: 0.2, hkEquity: 0.26, usEquity: 0.18, globalExUsEquity: 0.18, gold: 0.1, reits: 0.5, insurance: 0.12, property: 1, other: 0.28 },
-  other: { cash: 0.05, bonds: 0.12, chinaEquity: 0.4, sectorEquity: 0.42, singleStocks: 0.45, hkEquity: 0.42, usEquity: 0.35, globalExUsEquity: 0.35, gold: 0.18, reits: 0.35, insurance: 0.1, property: 0.28, other: 1 }
+  cash: { cash: 1, bonds: 0.18, chinaEquity: 0.03, sectorEquity: 0.03, singleStocks: 0.03, hkEquity: 0.03, usEquity: 0.02, usTechGrowth: 0.02, globalExUsEquity: 0.02, gold: 0, reits: 0.05, insurance: 0.12, property: 0.05, other: 0.05 },
+  bonds: { cash: 0.18, bonds: 1, chinaEquity: 0.12, sectorEquity: 0.1, singleStocks: 0.08, hkEquity: 0.1, usEquity: 0.08, usTechGrowth: 0.06, globalExUsEquity: 0.08, gold: 0.08, reits: 0.18, insurance: 0.35, property: 0.12, other: 0.12 },
+  chinaEquity: { cash: 0.03, bonds: 0.12, chinaEquity: 1, sectorEquity: 0.75, singleStocks: 0.65, hkEquity: 0.72, usEquity: 0.42, usTechGrowth: 0.46, globalExUsEquity: 0.48, gold: 0.05, reits: 0.42, insurance: 0.12, property: 0.28, other: 0.4 },
+  sectorEquity: { cash: 0.03, bonds: 0.1, chinaEquity: 0.75, sectorEquity: 1, singleStocks: 0.72, hkEquity: 0.68, usEquity: 0.42, usTechGrowth: 0.5, globalExUsEquity: 0.46, gold: 0.06, reits: 0.4, insurance: 0.1, property: 0.25, other: 0.42 },
+  singleStocks: { cash: 0.03, bonds: 0.08, chinaEquity: 0.65, sectorEquity: 0.72, singleStocks: 1, hkEquity: 0.55, usEquity: 0.35, usTechGrowth: 0.5, globalExUsEquity: 0.35, gold: 0.05, reits: 0.28, insurance: 0.08, property: 0.2, other: 0.45 },
+  hkEquity: { cash: 0.03, bonds: 0.1, chinaEquity: 0.72, sectorEquity: 0.68, singleStocks: 0.55, hkEquity: 1, usEquity: 0.52, usTechGrowth: 0.5, globalExUsEquity: 0.58, gold: 0.08, reits: 0.38, insurance: 0.1, property: 0.26, other: 0.42 },
+  usEquity: { cash: 0.02, bonds: 0.08, chinaEquity: 0.42, sectorEquity: 0.42, singleStocks: 0.35, hkEquity: 0.52, usEquity: 1, usTechGrowth: 0.88, globalExUsEquity: 0.72, gold: 0.04, reits: 0.34, insurance: 0.08, property: 0.18, other: 0.35 },
+  usTechGrowth: { cash: 0.02, bonds: 0.06, chinaEquity: 0.46, sectorEquity: 0.5, singleStocks: 0.5, hkEquity: 0.5, usEquity: 0.88, usTechGrowth: 1, globalExUsEquity: 0.65, gold: 0.03, reits: 0.3, insurance: 0.06, property: 0.15, other: 0.35 },
+  globalExUsEquity: { cash: 0.02, bonds: 0.08, chinaEquity: 0.48, sectorEquity: 0.46, singleStocks: 0.35, hkEquity: 0.58, usEquity: 0.72, usTechGrowth: 0.65, globalExUsEquity: 1, gold: 0.04, reits: 0.34, insurance: 0.08, property: 0.18, other: 0.35 },
+  gold: { cash: 0, bonds: 0.08, chinaEquity: 0.05, sectorEquity: 0.06, singleStocks: 0.05, hkEquity: 0.08, usEquity: 0.04, usTechGrowth: 0.03, globalExUsEquity: 0.04, gold: 1, reits: 0.12, insurance: 0.05, property: 0.1, other: 0.18 },
+  reits: { cash: 0.05, bonds: 0.18, chinaEquity: 0.42, sectorEquity: 0.4, singleStocks: 0.28, hkEquity: 0.38, usEquity: 0.34, usTechGrowth: 0.3, globalExUsEquity: 0.34, gold: 0.12, reits: 1, insurance: 0.14, property: 0.5, other: 0.35 },
+  insurance: { cash: 0.12, bonds: 0.35, chinaEquity: 0.12, sectorEquity: 0.1, singleStocks: 0.08, hkEquity: 0.1, usEquity: 0.08, usTechGrowth: 0.06, globalExUsEquity: 0.08, gold: 0.05, reits: 0.14, insurance: 1, property: 0.12, other: 0.1 },
+  property: { cash: 0.05, bonds: 0.12, chinaEquity: 0.28, sectorEquity: 0.25, singleStocks: 0.2, hkEquity: 0.26, usEquity: 0.18, usTechGrowth: 0.15, globalExUsEquity: 0.18, gold: 0.1, reits: 0.5, insurance: 0.12, property: 1, other: 0.28 },
+  other: { cash: 0.05, bonds: 0.12, chinaEquity: 0.4, sectorEquity: 0.42, singleStocks: 0.45, hkEquity: 0.42, usEquity: 0.35, usTechGrowth: 0.35, globalExUsEquity: 0.35, gold: 0.18, reits: 0.35, insurance: 0.1, property: 0.28, other: 1 }
 };
 
 export const portfolios = [
@@ -199,6 +210,14 @@ export const portfolios = [
     fit: "适合 5-10 年不用、能承受较大回撤，并愿意承担权益集中波动的人。",
     description: "更重视长期增值，把美股和宽基权益作为主体。行业主题和个股只保留小比例，避免把高收益潜力变成单点押注。",
     weights: { demandCash: 0.03, moneyFund: 0.02, bonds: 0.12, chinaBroadIndex: 0.22, dividendStrategy: 0.08, sectorFunds: 0.12, singleStocks: 0.05, hkChinaEquity: 0.05, usEquity: 0.25, globalExUsEquity: 0.03, gold: 0.03 }
+  },
+  {
+    id: "soloMaxGrowth",
+    name: "单身极进取 10%+",
+    badge: "极高风险",
+    fit: "适合单身、现金流稳定、10 年以上不用、能承受 40% 以上回撤的人。",
+    description: "这是历史乐观口径下的高风险增长模型，核心押注美股科技、宽基权益和少量主题/个股。它可能长期高收益，也可能经历深度回撤和多年不赚钱。",
+    weights: { demandCash: 0.01, bonds: 0.02, chinaBroadIndex: 0.05, sectorFunds: 0.12, singleStocks: 0.08, hkChinaEquity: 0.02, usEquity: 0.25, usTechGrowth: 0.4, globalExUsEquity: 0.02, gold: 0.03 }
   },
   {
     id: "cnIncome",

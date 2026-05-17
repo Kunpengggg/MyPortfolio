@@ -173,7 +173,7 @@ function renderSummary() {
   nodes.totalAssets.textContent = formatter.format(total);
 
   if (!hasInputAssets()) {
-    nodes.riskLabel.textContent = "待录入";
+    nodes.riskLabel.textContent = `目标：${riskLevel(targetStats.volatility)}`;
     nodes.diagnosis.textContent = "录入资产后，这里会生成一句话诊断，帮助你判断当前配置偏保守、偏激进，还是接近目标。";
     nodes.metrics.innerHTML = [
       ["当前预期收益", "-"],
@@ -189,7 +189,7 @@ function renderSummary() {
     return;
   }
 
-  nodes.riskLabel.textContent = riskLevel(currentStats.volatility);
+  nodes.riskLabel.textContent = `目标：${riskLevel(targetStats.volatility)}`;
   nodes.diagnosis.textContent = diagnosisText(currentStats, targetStats, state.assets);
 
   nodes.metrics.innerHTML = [
@@ -354,7 +354,7 @@ function recommendedPortfolioId() {
   if (horizon === "retirement") return "cnRetirement";
   if (horizon === "short" || goal === "liquidity") return "cnIncome";
   if (drawdown === "low") return "cnStable";
-  if (horizon === "long" && drawdown === "high" && goal === "growth") return "cnHighReturn";
+  if (horizon === "long" && drawdown === "high" && goal === "growth") return "soloMaxGrowth";
   if (goal === "growth" && drawdown !== "low") return "cnGrowth";
   if (goal === "balance" && drawdown === "medium") return "cnBalanced";
   return "cnBalanced";
