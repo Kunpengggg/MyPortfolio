@@ -1,0 +1,328 @@
+import { assetClasses, portfolios, sampleAssets } from "./data.js";
+import {
+  normalizeInvestableTargetWeights,
+  portfolioStats,
+  rebalanceRows,
+  riskLevel,
+  scenarios,
+  sumAssets,
+  weightsFromInvestableAssets
+} from "./engine.js";
+import { clearSnapshots, deleteSnapshot, loadSnapshots, saveSnapshot } from "./store.js";
+
+const state = {
+  assets: { ...sampleAssets },
+  portfolioId: "cnBalanced",
+  snapshots: loadSnapshots()
+};
+
+const formatter = new Intl.NumberFormat("zh-CN", {
+  style: "currency",
+  currency: "CNY",
+  maximumFractionDigits: 0
+});
+
+const percentFormatter = new Intl.NumberFormat("zh-CN", {
+  style: "percent",
+  maximumFractionDigits: 1
+});
+
+const nodes = {
+  assetInputs: document.querySelector("#assetInputs"),
+  totalAssets: document.querySelector("#totalAssets"),
+  portfolioCards: document.querySelector("#portfolioCards"),
+  portfolioDescription: document.querySelector("#portfolioDescription"),
+  diagnosis: document.querySelector("#diagnosis"),
+  targetBars: document.querySelector("#targetBars"),
+  metrics: document.querySelector("#metrics"),
+  riskLabel: document.querySelector("#riskLabel"),
+  scenarioTable: document.querySelector("#scenarioTable"),
+  rebalanceList: document.querySelector("#rebalanceList"),
+  historyList: document.querySelector("#historyList"),
+  saveSnapshotBtn: document.querySelector("#saveSnapshotBtn"),
+  resetBtn: document.querySelector("#resetBtn"),
+  clearHistoryBtn: document.querySelector("#clearHistoryBtn"),
+  horizonSelect: document.querySelector("#horizonSelect"),
+  drawdownSelect: document.querySelector("#drawdownSelect"),
+  goalSelect: document.querySelector("#goalSelect"),
+  recommendBtn: document.querySelector("#recommendBtn"),
+  recommendationResult: document.querySelector("#recommendationResult")
+};
+
+function selectedPortfolio() {
+  return portfolios.find((portfolio) => portfolio.id === state.portfolioId) || portfolios[0];
+}
+
+function renderInputs() {
+  nodes.assetInputs.innerHTML = assetClasses
+    .map((asset) => {
+      const value = state.assets[asset.id] || "";
+      return `
+        <label class="asset-row">
+          <span>
+            <span class="asset-name">${asset.name}</span>
+            <span class="asset-meta">${asset.hint}</span>
+          </span>
+          <input data-asset-id="${asset.id}" type="number" min="0" step="100" value="${value}" aria-label="${asset.name}金额" />
+        </label>
+      `;
+    })
+    .join("");
+}
+
+function renderPortfolioCards() {
+  const sortedPortfolios = [...portfolios].sort((left, right) => {
+    return (
+      portfolioStats(normalizeInvestableTargetWeights(left.weights)).volatility -
+      portfolioStats(normalizeInvestableTargetWeights(right.weights)).volatility
+    );
+  });
+
+  nodes.portfolioCards.innerHTML = sortedPortfolios
+    .map((portfolio) => {
+      const stats = portfolioStats(normalizeInvestableTargetWeights(portfolio.weights));
+      const checked = portfolio.id === state.portfolioId;
+      return `
+        <button class="portfolio-card" type="button" role="radio" aria-checked="${checked}" data-portfolio-id="${portfolio.id}">
+          <span class="portfolio-card-head">
+            <span class="portfolio-card-title">${portfolio.name}</span>
+            <span class="portfolio-badge">${portfolio.badge}</span>
+          </span>
+          <span class="portfolio-card-meta">
+            <span>预期收益<strong>${percentFormatter.format(stats.expectedReturn)}</strong></span>
+            <span>波动率<strong>${percentFormatter.format(stats.volatility)}</strong></span>
+            <span>风险<strong>${riskLevel(stats.volatility)}</strong></span>
+          </span>
+          <span class="portfolio-fit">${portfolio.fit}</span>
+        </button>
+      `;
+    })
+    .join("");
+}
+
+function renderTarget() {
+  const portfolio = selectedPortfolio();
+  nodes.portfolioDescription.textContent = portfolio.description;
+  nodes.targetBars.innerHTML = assetClasses
+    .filter((asset) => portfolio.weights[asset.id])
+    .map((asset) => {
+      const weight = portfolio.weights[asset.id];
+      return `
+        <div class="bar-row">
+          <span>${asset.name}</span>
+          <span class="bar-track"><span class="bar-fill" style="width: ${weight * 100}%"></span></span>
+          <strong>${percentFormatter.format(weight)}</strong>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderSummary() {
+  const total = sumAssets(state.assets);
+  const currentStats = portfolioStats(weightsFromInvestableAssets(state.assets));
+  const targetStats = portfolioStats(normalizeInvestableTargetWeights(selectedPortfolio().weights));
+  nodes.totalAssets.textContent = formatter.format(total);
+  nodes.riskLabel.textContent = riskLevel(currentStats.volatility);
+  nodes.diagnosis.textContent = diagnosisText(currentStats, targetStats);
+
+  nodes.metrics.innerHTML = [
+    ["当前预期收益", percentFormatter.format(currentStats.expectedReturn)],
+    ["当前波动率", percentFormatter.format(currentStats.volatility)],
+    ["目标波动率", percentFormatter.format(targetStats.volatility)],
+    ["目标预期收益", percentFormatter.format(targetStats.expectedReturn)],
+    ["收益/波动", targetStats.score.toFixed(2)],
+    ["组合差异", percentFormatter.format(Math.abs(targetStats.volatility - currentStats.volatility))]
+  ]
+    .map(([label, value]) => `<div class="metric-card"><span>${label}</span><strong>${value}</strong></div>`)
+    .join("");
+
+  nodes.scenarioTable.innerHTML = `
+    <div class="scenario-row"><span>目标组合情景</span><span>收益</span><span>波动</span></div>
+    ${scenarios(targetStats)
+      .map(
+        (scenario) => `
+          <div class="scenario-row">
+            <span>${scenario.name}</span>
+            <span>${percentFormatter.format(scenario.expectedReturn)}</span>
+            <span>${percentFormatter.format(scenario.volatility)}</span>
+          </div>
+        `
+      )
+      .join("")}
+  `;
+}
+
+function renderRebalance() {
+  const rows = rebalanceRows(state.assets, selectedPortfolio().weights).sort((a, b) => b.absDelta - a.absDelta);
+  nodes.rebalanceList.innerHTML = rows
+    .filter((row) => row.currentAmount > 0 || row.targetWeight > 0)
+    .map((row) => {
+      const deltaClass = row.delta >= 0 ? "delta-positive" : "delta-negative";
+      const action = row.delta >= 0 ? "增加" : "减少";
+      const deltaText = row.rebalanceable
+        ? `${action} ${formatter.format(Math.abs(row.delta))}`
+        : "观察项";
+      const targetText = row.rebalanceable ? formatter.format(row.targetAmount) : "不直接调仓";
+      const targetWeightText = row.rebalanceable ? percentFormatter.format(row.targetWeight) : "观察";
+      const currentWeightText = row.rebalanceable
+        ? `金融资产占比 ${percentFormatter.format(row.investableWeight)}`
+        : `总资产占比 ${percentFormatter.format(row.currentWeight)}`;
+      return `
+        <div class="rebalance-item">
+          <div>
+            <strong>${row.name}</strong>
+            <span class="rebalance-sub">${currentWeightText} → 目标 ${targetWeightText}</span>
+          </div>
+          <span>${formatter.format(row.currentAmount)}</span>
+          <span>${targetText}</span>
+          <span>
+            <span class="${row.rebalanceable ? deltaClass : "muted"}">${deltaText}</span>
+            ${row.rebalanceable && row.absDelta > 0 ? `<span class="rebalance-sub">可分 3-6 次调整</span>` : ""}
+          </span>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function diagnosisText(currentStats, targetStats) {
+  const volatilityGap = currentStats.volatility - targetStats.volatility;
+  const returnGap = currentStats.expectedReturn - targetStats.expectedReturn;
+
+  if (volatilityGap > 0.025) {
+    return `一句话诊断：你的金融资产比当前目标更激进，预期波动高 ${percentFormatter.format(volatilityGap)}。如果这笔钱 3 年内可能用到，优先降低权益和高波动资产。`;
+  }
+
+  if (volatilityGap < -0.025) {
+    return `一句话诊断：你的金融资产比当前目标更保守，预期波动低 ${percentFormatter.format(Math.abs(volatilityGap))}，但长期收益弹性也可能偏低。`;
+  }
+
+  if (returnGap < -0.008) {
+    return `一句话诊断：你的金融资产风险接近目标，但预期收益略低。可以检查现金类和固收类是否占比过高。`;
+  }
+
+  return "一句话诊断：你的金融资产和当前目标组合接近，下一步重点是定期记录和小幅再平衡，而不是频繁交易。";
+}
+
+function recommendedPortfolioId() {
+  const horizon = nodes.horizonSelect.value;
+  const drawdown = nodes.drawdownSelect.value;
+  const goal = nodes.goalSelect.value;
+
+  if (horizon === "retirement") return "cnRetirement";
+  if (horizon === "short" || goal === "liquidity") return "cnIncome";
+  if (drawdown === "low") return "cnStable";
+  if (horizon === "long" && drawdown === "high" && goal === "growth") return "cnGrowth";
+  if (goal === "growth" && drawdown !== "low") return "cnGrowth";
+  if (goal === "balance" && drawdown === "medium") return "cnBalanced";
+  return "cnBalanced";
+}
+
+function applyRecommendation() {
+  const id = recommendedPortfolioId();
+  const portfolio = portfolios.find((item) => item.id === id) || selectedPortfolio();
+  state.portfolioId = portfolio.id;
+  nodes.recommendationResult.textContent = `推荐：${portfolio.name}。${portfolio.fit}`;
+  renderPortfolioCards();
+  renderAll();
+}
+
+function renderHistory() {
+  if (state.snapshots.length === 0) {
+    nodes.historyList.innerHTML = `<p class="muted">还没有保存的快照。录入资产后点击“保存快照”。</p>`;
+    return;
+  }
+
+  nodes.historyList.innerHTML = state.snapshots
+    .map((snapshot) => {
+      const date = new Date(snapshot.createdAt).toLocaleString("zh-CN", { hour12: false });
+      return `
+        <div class="history-item">
+          <div>
+            <div class="history-title">${date}</div>
+            <div class="muted">${snapshot.portfolioName} · ${formatter.format(sumAssets(snapshot.assets))}</div>
+          </div>
+          <div class="history-actions">
+            <button data-load-id="${snapshot.id}" class="ghost-btn" type="button">加载</button>
+            <button data-delete-id="${snapshot.id}" class="ghost-btn danger" type="button">删除</button>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderAll() {
+  renderTarget();
+  renderSummary();
+  renderRebalance();
+  renderHistory();
+}
+
+function bindEvents() {
+  nodes.assetInputs.addEventListener("input", (event) => {
+    const assetId = event.target.dataset.assetId;
+    if (!assetId) return;
+    state.assets[assetId] = event.target.value;
+    renderAll();
+  });
+
+  nodes.portfolioCards.addEventListener("click", (event) => {
+    const card = event.target.closest("[data-portfolio-id]");
+    if (!card) return;
+    state.portfolioId = card.dataset.portfolioId;
+    renderPortfolioCards();
+    renderAll();
+  });
+
+  nodes.recommendBtn.addEventListener("click", applyRecommendation);
+
+  nodes.saveSnapshotBtn.addEventListener("click", () => {
+    const portfolio = selectedPortfolio();
+    state.snapshots = saveSnapshot({
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      portfolioId: portfolio.id,
+      portfolioName: portfolio.name,
+      assets: { ...state.assets }
+    });
+    renderHistory();
+  });
+
+  nodes.resetBtn.addEventListener("click", () => {
+    state.assets = { ...sampleAssets };
+    renderInputs();
+    renderAll();
+  });
+
+  nodes.clearHistoryBtn.addEventListener("click", () => {
+    state.snapshots = clearSnapshots();
+    renderHistory();
+  });
+
+  nodes.historyList.addEventListener("click", (event) => {
+    const loadId = event.target.dataset.loadId;
+    const deleteId = event.target.dataset.deleteId;
+
+    if (loadId) {
+      const snapshot = state.snapshots.find((item) => item.id === loadId);
+      if (!snapshot) return;
+      state.assets = { ...snapshot.assets };
+      state.portfolioId = snapshot.portfolioId;
+      renderInputs();
+      renderPortfolioCards();
+      renderAll();
+    }
+
+    if (deleteId) {
+      state.snapshots = deleteSnapshot(deleteId);
+      renderHistory();
+    }
+  });
+}
+
+renderInputs();
+renderPortfolioCards();
+renderAll();
+bindEvents();

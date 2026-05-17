@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>中国家庭资产配置分析器</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">China local-first portfolio lab</p>
+        <h1>中国家庭资产配置分析器</h1>
+      </div>
+      <div class="header-actions">
+        <button id="saveSnapshotBtn" class="primary-btn" type="button">保存快照</button>
+        <button id="resetBtn" class="ghost-btn" type="button">重置示例</button>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <div class="content-column">
+        <section class="panel input-panel" aria-labelledby="assetInputTitle">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Step 1</p>
+              <h2 id="assetInputTitle">录入家庭资产</h2>
+            </div>
+            <p id="totalAssets" class="total-pill">$0</p>
+          </div>
+          <div id="assetInputs" class="asset-grid"></div>
+        </section>
+
+        <section class="panel summary-panel" aria-labelledby="summaryTitle">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Step 3</p>
+              <h2 id="summaryTitle">风险收益摘要</h2>
+            </div>
+            <span id="riskLabel" class="risk-label">-</span>
+          </div>
+          <div id="diagnosis" class="diagnosis-box"></div>
+          <div id="metrics" class="metrics-grid"></div>
+          <div id="scenarioTable" class="scenario-table"></div>
+        </section>
+
+        <section class="panel rebalance-panel" aria-labelledby="rebalanceTitle">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Step 4</p>
+              <h2 id="rebalanceTitle">加减建议</h2>
+            </div>
+            <p class="muted">按可投资金融资产估算</p>
+          </div>
+          <div id="rebalanceList" class="rebalance-list"></div>
+        </section>
+      </div>
+
+      <div class="content-column">
+        <section class="panel target-panel" aria-labelledby="targetTitle">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Step 2</p>
+              <h2 id="targetTitle">选择金融资产目标组合</h2>
+            </div>
+          </div>
+          <div class="portfolio-guidance">
+            <strong>默认建议：国内均衡配置</strong>
+            <span>如果你不确定怎么选，先用它。下面按波动率从低到高排列，越往下通常收益弹性越高、账户起伏也越大。</span>
+          </div>
+          <div class="recommendation-box" aria-label="帮我选择组合">
+            <div class="recommendation-head">
+              <strong>帮我选择</strong>
+              <button id="recommendBtn" class="ghost-btn" type="button">生成推荐</button>
+            </div>
+            <label>
+              这笔钱多久不用
+              <select id="horizonSelect">
+                <option value="short">1-3 年内可能要用</option>
+                <option value="medium" selected>3-5 年不用</option>
+                <option value="long">5 年以上不用</option>
+                <option value="retirement">养老长期账户</option>
+              </select>
+            </label>
+            <label>
+              最大能接受的账户下跌
+              <select id="drawdownSelect">
+                <option value="low">最好别明显亏</option>
+                <option value="medium" selected>10% 左右可以接受</option>
+                <option value="high">20% 以上也能扛</option>
+              </select>
+            </label>
+            <label>
+              当前最重要的目标
+              <select id="goalSelect">
+                <option value="liquidity">保留流动性</option>
+                <option value="balance" selected>稳健增值</option>
+                <option value="growth">长期增长</option>
+              </select>
+            </label>
+            <p id="recommendationResult" class="recommendation-result">不确定就先选“国内均衡配置”。</p>
+          </div>
+          <div id="portfolioCards" class="portfolio-cards" role="radiogroup" aria-label="目标组合模板"></div>
+          <div id="portfolioDescription" class="portfolio-description"></div>
+          <div id="targetBars" class="target-bars"></div>
+        </section>
+
+        <section class="panel history-panel" aria-labelledby="historyTitle">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Local data</p>
+              <h2 id="historyTitle">本地历史</h2>
+            </div>
+            <button id="clearHistoryBtn" class="ghost-btn danger" type="button">清空历史</button>
+          </div>
+          <div id="historyList" class="history-list"></div>
+        </section>
+
+        <section class="panel insight-panel" aria-labelledby="insightTitle">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Product note</p>
+              <h2 id="insightTitle">产品建议</h2>
+            </div>
+          </div>
+          <div class="insight-copy">
+            <p>国内版更适合做成“家庭总资产体检 + 金融资产再平衡”的工具：房产、保险、养老金可以纳入总资产观察，但调仓建议只作用于可投资金融资产。</p>
+            <p>推广时可以主打“从存款和房产思维，过渡到多资产配置”。用户最需要的是看清现金、固收、权益、黄金、房产之间的比例，而不是预测下个月涨跌。</p>
+            <p class="disclaimer">结果仅供教育和个人规划参考，不构成投资、税务或法律建议。境内基金、理财、保险、房产等资产存在不同流动性、税费和监管约束，历史数据和资本市场假设不保证未来结果。</p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script type="module" src="src/ui.js"></script>
+  </body>
+</html>
