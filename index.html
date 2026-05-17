@@ -26,11 +26,16 @@
               <p class="eyebrow">Step 1</p>
               <h2 id="assetInputTitle">录入家庭资产</h2>
             </div>
-            <p id="totalAssets" class="total-pill">$0</p>
-          </div>
-          <div class="asset-guide">
-            <strong>美股怎么填</strong>
-            <span>标普500、美国全市场、普通美股 QDII 放在“美国核心宽基”；纳指100、AI、科技成长类基金放在“美股科技卫星”。普通用户优先把核心宽基作为主仓，科技卫星只用于提高收益弹性和波动。</span>
+            <div class="heading-actions">
+              <details class="asset-help">
+                <summary>美股分类提示</summary>
+                <div>
+                  <p>标普500、美国全市场、普通美股 QDII 放在“美国核心宽基”。</p>
+                  <p>纳指100、AI、科技成长类基金放在“美股科技卫星”。</p>
+                </div>
+              </details>
+              <p id="totalAssets" class="total-pill">$0</p>
+            </div>
           </div>
           <div id="assetInputs" class="asset-grid"></div>
         </section>
@@ -95,7 +100,7 @@
           </div>
           <div class="model-note">
             <strong>模型口径</strong>
-            <span>稳健和均衡模型采用偏保守的长期资本市场假设；进取模型会提高美国核心宽基、科技成长和权益比例；10%+ 模型使用历史乐观口径，只适合极高风险承受力。</span>
+            <span>收益率采用长期名义年化假设：稳健模型偏保守，进取模型更接近历史权益收益，高科技模型把纳指/AI 作为主要收益引擎，但需要承受更大回撤。</span>
           </div>
           <div class="recommendation-box" aria-label="帮我选择组合">
             <div class="recommendation-head">

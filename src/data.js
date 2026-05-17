@@ -33,7 +33,7 @@ export const assetClasses = [
     id: "chinaBroadIndex",
     name: "A股宽基指数",
     hint: "沪深300、中证500、创业板、A500、全市场",
-    expectedReturn: 0.068,
+    expectedReturn: 0.07,
     volatility: 0.22,
     group: "chinaEquity",
     color: "#2f75b5",
@@ -82,9 +82,9 @@ export const assetClasses = [
   {
     id: "usEquity",
     name: "美国核心宽基",
-    hint: "标普500、美国全市场 QDII；普通人美股主仓填这里",
+    hint: "标普500、美国全市场 QDII；美股分散主仓",
     role: "核心仓",
-    expectedReturn: 0.09,
+    expectedReturn: 0.105,
     volatility: 0.18,
     group: "usEquity",
     color: "#4c78a8",
@@ -93,10 +93,10 @@ export const assetClasses = [
   {
     id: "usTechGrowth",
     name: "美股科技卫星",
-    hint: "纳指100、AI、科技成长；只填高波动增强仓",
-    role: "卫星仓",
-    expectedReturn: 0.14,
-    volatility: 0.28,
+    hint: "纳指100、AI、科技成长；高收益弹性仓",
+    role: "增长仓",
+    expectedReturn: 0.16,
+    volatility: 0.3,
     group: "usTechGrowth",
     color: "#2f5597",
     rebalanceable: true
@@ -115,7 +115,7 @@ export const assetClasses = [
     id: "gold",
     name: "黄金",
     hint: "黄金 ETF、积存金、实物黄金",
-    expectedReturn: 0.045,
+    expectedReturn: 0.05,
     volatility: 0.16,
     group: "gold",
     color: "#c99a2e",
@@ -194,32 +194,32 @@ export const portfolios = [
     name: "国内均衡配置",
     badge: "默认推荐",
     fit: "适合多数家庭的长期闲钱：希望比存款更有弹性，但不想把权益仓位拉太高。",
-    description: "股债黄金多元配置，权益部分以 A股宽基、红利和美国核心宽基为主体，科技成长和港股/中概只做小比例卫星仓。",
-    weights: { demandCash: 0.07, moneyFund: 0.07, bonds: 0.3, chinaBroadIndex: 0.12, dividendStrategy: 0.08, sectorFunds: 0.03, hkChinaEquity: 0.02, usEquity: 0.16, usTechGrowth: 0.04, globalExUsEquity: 0.02, gold: 0.09 }
+    description: "股债黄金多元配置，权益部分以 A股宽基、红利、美国核心宽基和纳指科技为主体，港股/中概只做小比例卫星仓。",
+    weights: { demandCash: 0.07, moneyFund: 0.07, bonds: 0.28, chinaBroadIndex: 0.11, dividendStrategy: 0.07, sectorFunds: 0.03, hkChinaEquity: 0.02, usEquity: 0.16, usTechGrowth: 0.08, globalExUsEquity: 0.02, gold: 0.09 }
   },
   {
     id: "cnGrowth",
     name: "国内进取长期",
     badge: "收益潜力高",
     fit: "适合 5 年以上不用、能接受账户明显上下波动的钱。",
-    description: "提高中美宽基和科技成长占比，追求更高长期收益弹性；港股/中概保留低比例，用于估值修复机会而非重仓押注。",
-    weights: { demandCash: 0.03, moneyFund: 0.03, bonds: 0.16, chinaBroadIndex: 0.18, dividendStrategy: 0.07, sectorFunds: 0.08, singleStocks: 0.03, hkChinaEquity: 0.03, usEquity: 0.22, usTechGrowth: 0.08, globalExUsEquity: 0.02, gold: 0.07 }
+    description: "提高中美宽基和纳指科技占比，追求更高长期收益弹性；港股/中概保留低比例，用于估值修复机会而非重仓押注。",
+    weights: { demandCash: 0.03, moneyFund: 0.03, bonds: 0.13, chinaBroadIndex: 0.16, dividendStrategy: 0.06, sectorFunds: 0.08, singleStocks: 0.03, hkChinaEquity: 0.03, usEquity: 0.22, usTechGrowth: 0.15, globalExUsEquity: 0.02, gold: 0.06 }
   },
   {
     id: "cnHighReturn",
     name: "长期进取增长",
     badge: "高收益潜力",
     fit: "适合 5-10 年不用、能承受较大回撤，并愿意承担权益集中波动的人。",
-    description: "更重视长期增值，把美国核心宽基、A股宽基和科技成长作为主体。行业主题和个股控制在可承受范围内，避免把高收益潜力变成单点押注。",
-    weights: { demandCash: 0.02, moneyFund: 0.02, bonds: 0.09, chinaBroadIndex: 0.18, dividendStrategy: 0.06, sectorFunds: 0.12, singleStocks: 0.05, hkChinaEquity: 0.03, usEquity: 0.28, usTechGrowth: 0.1, globalExUsEquity: 0.02, gold: 0.03 }
+    description: "更重视长期增值，把美国核心宽基、纳指科技和 A股宽基作为主体。行业主题和个股控制在可承受范围内，避免把高收益潜力变成单点押注。",
+    weights: { demandCash: 0.02, moneyFund: 0.02, bonds: 0.07, chinaBroadIndex: 0.16, dividendStrategy: 0.05, sectorFunds: 0.1, singleStocks: 0.05, hkChinaEquity: 0.02, usEquity: 0.28, usTechGrowth: 0.18, globalExUsEquity: 0.02, gold: 0.03 }
   },
   {
     id: "soloMaxGrowth",
-    name: "单身极进取 10%+",
+    name: "全球科技进取 10%+",
     badge: "极高风险",
-    fit: "适合单身、现金流稳定、10 年以上不用、能承受 40% 以上回撤的人。",
-    description: "这是历史乐观口径下的高风险增长模型，核心押注美国核心宽基和科技成长，少量配置 A股、主题、个股和黄金。它可能长期高收益，也可能经历深度回撤和多年不赚钱。",
-    weights: { demandCash: 0.01, bonds: 0.02, chinaBroadIndex: 0.05, sectorFunds: 0.1, singleStocks: 0.06, hkChinaEquity: 0.02, usEquity: 0.32, usTechGrowth: 0.38, globalExUsEquity: 0.02, gold: 0.02 }
+    fit: "适合现金流稳定、10 年以上不用、能承受 40% 以上回撤，并主动追求科技成长收益的人。",
+    description: "这是历史乐观口径下的高风险增长模型，核心押注美国核心宽基和纳指/AI 科技成长，少量配置 A股、主题、个股和黄金。它可能长期高收益，也可能经历深度回撤和多年不赚钱。",
+    weights: { demandCash: 0.01, bonds: 0.01, chinaBroadIndex: 0.04, sectorFunds: 0.08, singleStocks: 0.05, hkChinaEquity: 0.01, usEquity: 0.3, usTechGrowth: 0.46, globalExUsEquity: 0.02, gold: 0.02 }
   },
   {
     id: "cnIncome",

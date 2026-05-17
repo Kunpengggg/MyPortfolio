@@ -126,6 +126,7 @@ function renderPortfolioCards() {
           <span class="portfolio-card-meta">
             <span>预期收益<strong>${percentFormatter.format(stats.expectedReturn)}</strong></span>
             <span>波动率<strong>${percentFormatter.format(stats.volatility)}</strong></span>
+            <span>科技仓<strong>${percentFormatter.format(normalizeInvestableTargetWeights(portfolio.weights).usTechGrowth || 0)}</strong></span>
             <span>风险<strong>${riskLevel(stats.volatility)}</strong></span>
           </span>
           <span class="portfolio-fit">${portfolio.fit}</span>
