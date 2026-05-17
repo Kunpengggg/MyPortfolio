@@ -32,8 +32,8 @@ export const assetClasses = [
   {
     id: "chinaBroadIndex",
     name: "A股宽基指数",
-    hint: "沪深300、中证500、创业板、全市场",
-    expectedReturn: 0.065,
+    hint: "沪深300、中证500、创业板、A500、全市场",
+    expectedReturn: 0.068,
     volatility: 0.22,
     group: "chinaEquity",
     color: "#2f75b5",
@@ -53,7 +53,7 @@ export const assetClasses = [
     id: "sectorFunds",
     name: "行业 / 主题基金",
     hint: "科技、医药、新能源、半导体等",
-    expectedReturn: 0.08,
+    expectedReturn: 0.085,
     volatility: 0.32,
     group: "sectorEquity",
     color: "#b86b2b",
@@ -63,7 +63,7 @@ export const assetClasses = [
     id: "singleStocks",
     name: "个股",
     hint: "单只股票或高度集中的股票组合",
-    expectedReturn: 0.09,
+    expectedReturn: 0.095,
     volatility: 0.45,
     group: "singleStocks",
     color: "#a94442",
@@ -81,9 +81,10 @@ export const assetClasses = [
   },
   {
     id: "usEquity",
-    name: "美股 / 标普纳指",
-    hint: "标普500、纳指100、美国全市场 QDII",
-    expectedReturn: 0.085,
+    name: "美国核心宽基",
+    hint: "标普500、美国全市场 QDII；普通人美股主仓填这里",
+    role: "核心仓",
+    expectedReturn: 0.09,
     volatility: 0.18,
     group: "usEquity",
     color: "#4c78a8",
@@ -91,9 +92,10 @@ export const assetClasses = [
   },
   {
     id: "usTechGrowth",
-    name: "美股科技 / 纳指增强",
-    hint: "纳指100、AI、科技成长类基金",
-    expectedReturn: 0.15,
+    name: "美股科技卫星",
+    hint: "纳指100、AI、科技成长；只填高波动增强仓",
+    role: "卫星仓",
+    expectedReturn: 0.14,
     volatility: 0.28,
     group: "usTechGrowth",
     color: "#2f5597",
@@ -113,7 +115,7 @@ export const assetClasses = [
     id: "gold",
     name: "黄金",
     hint: "黄金 ETF、积存金、实物黄金",
-    expectedReturn: 0.04,
+    expectedReturn: 0.045,
     volatility: 0.16,
     group: "gold",
     color: "#c99a2e",
@@ -184,64 +186,64 @@ export const portfolios = [
     name: "国内稳健固收+",
     badge: "更稳",
     fit: "适合不想大幅波动、刚开始从存款转向基金/理财的人。",
-    description: "面向中国普通家庭的低波动组合：保留现金流动性，以债券/固收为核心，用宽基指数、红利、美股和黄金提升长期弹性。",
-    weights: { demandCash: 0.15, moneyFund: 0.1, bonds: 0.45, chinaBroadIndex: 0.08, dividendStrategy: 0.07, usEquity: 0.05, gold: 0.1 }
+    description: "面向中国普通家庭的低波动组合：保留现金流动性，以债券/固收为核心，用宽基、红利、美国核心宽基和黄金提升长期弹性。",
+    weights: { demandCash: 0.14, moneyFund: 0.1, bonds: 0.43, chinaBroadIndex: 0.08, dividendStrategy: 0.07, usEquity: 0.06, gold: 0.12 }
   },
   {
     id: "cnBalanced",
     name: "国内均衡配置",
     badge: "默认推荐",
     fit: "适合多数家庭的长期闲钱：希望比存款更有弹性，但不想把权益仓位拉太高。",
-    description: "股债黄金多元配置，权益部分以 A股宽基、红利和美股为核心，港股/中概降为卫星仓位。",
-    weights: { demandCash: 0.08, moneyFund: 0.08, bonds: 0.32, chinaBroadIndex: 0.14, dividendStrategy: 0.08, sectorFunds: 0.03, hkChinaEquity: 0.03, usEquity: 0.15, globalExUsEquity: 0.02, gold: 0.07 }
+    description: "股债黄金多元配置，权益部分以 A股宽基、红利和美国核心宽基为主体，科技成长和港股/中概只做小比例卫星仓。",
+    weights: { demandCash: 0.07, moneyFund: 0.07, bonds: 0.3, chinaBroadIndex: 0.12, dividendStrategy: 0.08, sectorFunds: 0.03, hkChinaEquity: 0.02, usEquity: 0.16, usTechGrowth: 0.04, globalExUsEquity: 0.02, gold: 0.09 }
   },
   {
     id: "cnGrowth",
     name: "国内进取长期",
     badge: "收益潜力高",
     fit: "适合 5 年以上不用、能接受账户明显上下波动的钱。",
-    description: "提高宽基、红利、行业主题和美股占比，追求更高长期收益弹性；港股/中概只保留小比例。",
-    weights: { demandCash: 0.04, moneyFund: 0.04, bonds: 0.2, chinaBroadIndex: 0.2, dividendStrategy: 0.08, sectorFunds: 0.08, singleStocks: 0.03, hkChinaEquity: 0.05, usEquity: 0.2, globalExUsEquity: 0.03, gold: 0.05 }
+    description: "提高中美宽基和科技成长占比，追求更高长期收益弹性；港股/中概保留低比例，用于估值修复机会而非重仓押注。",
+    weights: { demandCash: 0.03, moneyFund: 0.03, bonds: 0.16, chinaBroadIndex: 0.18, dividendStrategy: 0.07, sectorFunds: 0.08, singleStocks: 0.03, hkChinaEquity: 0.03, usEquity: 0.22, usTechGrowth: 0.08, globalExUsEquity: 0.02, gold: 0.07 }
   },
   {
     id: "cnHighReturn",
     name: "长期进取增长",
     badge: "高收益潜力",
     fit: "适合 5-10 年不用、能承受较大回撤，并愿意承担权益集中波动的人。",
-    description: "更重视长期增值，把美股和宽基权益作为主体。行业主题和个股只保留小比例，避免把高收益潜力变成单点押注。",
-    weights: { demandCash: 0.03, moneyFund: 0.02, bonds: 0.12, chinaBroadIndex: 0.22, dividendStrategy: 0.08, sectorFunds: 0.12, singleStocks: 0.05, hkChinaEquity: 0.05, usEquity: 0.25, globalExUsEquity: 0.03, gold: 0.03 }
+    description: "更重视长期增值，把美国核心宽基、A股宽基和科技成长作为主体。行业主题和个股控制在可承受范围内，避免把高收益潜力变成单点押注。",
+    weights: { demandCash: 0.02, moneyFund: 0.02, bonds: 0.09, chinaBroadIndex: 0.18, dividendStrategy: 0.06, sectorFunds: 0.12, singleStocks: 0.05, hkChinaEquity: 0.03, usEquity: 0.28, usTechGrowth: 0.1, globalExUsEquity: 0.02, gold: 0.03 }
   },
   {
     id: "soloMaxGrowth",
     name: "单身极进取 10%+",
     badge: "极高风险",
     fit: "适合单身、现金流稳定、10 年以上不用、能承受 40% 以上回撤的人。",
-    description: "这是历史乐观口径下的高风险增长模型，核心押注美股科技、宽基权益和少量主题/个股。它可能长期高收益，也可能经历深度回撤和多年不赚钱。",
-    weights: { demandCash: 0.01, bonds: 0.02, chinaBroadIndex: 0.05, sectorFunds: 0.12, singleStocks: 0.08, hkChinaEquity: 0.02, usEquity: 0.25, usTechGrowth: 0.4, globalExUsEquity: 0.02, gold: 0.03 }
+    description: "这是历史乐观口径下的高风险增长模型，核心押注美国核心宽基和科技成长，少量配置 A股、主题、个股和黄金。它可能长期高收益，也可能经历深度回撤和多年不赚钱。",
+    weights: { demandCash: 0.01, bonds: 0.02, chinaBroadIndex: 0.05, sectorFunds: 0.1, singleStocks: 0.06, hkChinaEquity: 0.02, usEquity: 0.32, usTechGrowth: 0.38, globalExUsEquity: 0.02, gold: 0.02 }
   },
   {
     id: "cnIncome",
     name: "现金流优先",
     badge: "短中期",
     fit: "适合 1-3 年可能要用的钱，优先保留流动性和较低波动。",
-    description: "强调流动性和较低波动，适合短中期目标资金或风险承受力较低的用户。",
-    weights: { demandCash: 0.2, moneyFund: 0.25, bonds: 0.4, dividendStrategy: 0.05, gold: 0.05, reits: 0.05 }
+    description: "强调流动性和较低波动，适合短中期目标资金或风险承受力较低的用户。黄金保留小比例用于通胀和地缘风险对冲。",
+    weights: { demandCash: 0.2, moneyFund: 0.24, bonds: 0.4, dividendStrategy: 0.05, gold: 0.06, reits: 0.05 }
   },
   {
     id: "cnRetirement",
     name: "养老长期稳健",
     badge: "养老",
     fit: "适合为养老单独做账户的人，保险/养老金作为长期锁定资产观察。",
-    description: "适合养老储备视角：把稳健资产作为主体，保留养老金/保险观察项，宽基、红利、美股和黄金用于抗通胀与长期增值。",
-    weights: { demandCash: 0.1, moneyFund: 0.1, bonds: 0.35, chinaBroadIndex: 0.1, dividendStrategy: 0.08, usEquity: 0.08, globalExUsEquity: 0.02, gold: 0.02, pensionInsurance: 0.15 }
+    description: "适合养老储备视角：把稳健资产作为主体，保留养老金/保险观察项，宽基、红利、美国核心宽基和黄金用于抗通胀与长期增值。",
+    weights: { demandCash: 0.09, moneyFund: 0.09, bonds: 0.34, chinaBroadIndex: 0.1, dividendStrategy: 0.08, usEquity: 0.1, globalExUsEquity: 0.02, gold: 0.03, pensionInsurance: 0.15 }
   },
   {
     id: "cnBarbell",
     name: "杠铃型配置",
     badge: "攻守分明",
     fit: "适合想把安全垫和增长仓分得很清楚的人。",
-    description: "一端是现金和债券，一端是宽基、红利、主题和黄金，中间少放，适合清晰区分安全垫和增长仓。",
-    weights: { demandCash: 0.15, moneyFund: 0.1, bonds: 0.3, chinaBroadIndex: 0.14, dividendStrategy: 0.08, sectorFunds: 0.04, hkChinaEquity: 0.03, usEquity: 0.1, gold: 0.06 }
+    description: "一端是现金和债券，一端是宽基、红利、科技成长和黄金，中间少放，适合清晰区分安全垫和增长仓。",
+    weights: { demandCash: 0.14, moneyFund: 0.1, bonds: 0.29, chinaBroadIndex: 0.13, dividendStrategy: 0.08, sectorFunds: 0.04, hkChinaEquity: 0.02, usEquity: 0.12, usTechGrowth: 0.03, gold: 0.05 }
   }
 ];
 

@@ -158,6 +158,25 @@ select {
   gap: 12px;
 }
 
+.asset-guide,
+.model-note {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid rgba(31, 111, 139, 0.2);
+  border-radius: 8px;
+  background: #f0f7f9;
+  color: #214655;
+  line-height: 1.5;
+}
+
+.asset-guide span,
+.model-note span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .asset-row {
   display: grid;
   grid-template-columns: 1fr 130px;
@@ -171,6 +190,22 @@ select {
 }
 
 .asset-name {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-weight: 800;
+}
+
+.asset-role {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #e8f2ef;
+  color: var(--green);
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -205,6 +240,12 @@ select {
   background: #eef7f2;
   color: #2f4f43;
   line-height: 1.45;
+}
+
+.model-note {
+  border-color: rgba(187, 138, 38, 0.25);
+  background: #fff8e8;
+  color: #6c5118;
 }
 
 .portfolio-guidance span {

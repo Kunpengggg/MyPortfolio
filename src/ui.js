@@ -85,7 +85,7 @@ function renderInputs() {
       return `
         <label class="asset-row">
           <span>
-            <span class="asset-name">${asset.name}</span>
+            <span class="asset-name">${asset.name}${asset.role ? `<span class="asset-role">${asset.role}</span>` : ""}</span>
             <span class="asset-meta">${asset.hint}</span>
           </span>
           <input data-asset-id="${asset.id}" type="number" min="0" step="100" value="${value}" aria-label="${asset.name}金额" />
@@ -326,24 +326,32 @@ function diagnosisText(currentStats, targetStats, assets) {
   const returnGap = currentStats.expectedReturn - targetStats.expectedReturn;
   const total = sumAssets(assets);
   const propertyRatio = total > 0 ? Number(assets.property || 0) / total : 0;
+  const investableTotal = assetClasses
+    .filter((asset) => asset.rebalanceable)
+    .reduce((sum, asset) => sum + Number(assets[asset.id] || 0), 0);
+  const usTechRatio = investableTotal > 0 ? Number(assets.usTechGrowth || 0) / investableTotal : 0;
   const propertyNote =
     propertyRatio > 0.6
       ? `另外，房产占总资产 ${percentFormatter.format(propertyRatio)}，这是国内家庭最需要优先观察的集中度风险。`
       : "";
+  const techNote =
+    usTechRatio > 0.25
+      ? `美股科技卫星占可投资资产 ${percentFormatter.format(usTechRatio)}，已经是高集中度仓位，建议确认这部分钱是否真能长期承受大幅回撤。`
+      : "";
 
   if (volatilityGap > 0.025) {
-    return `一句话诊断：你的金融资产比当前目标更激进，预期波动高 ${percentFormatter.format(volatilityGap)}。如果这笔钱 3 年内可能用到，优先降低权益和高波动资产。${propertyNote}`;
+    return `一句话诊断：你的金融资产比当前目标更激进，预期波动高 ${percentFormatter.format(volatilityGap)}。如果这笔钱 3 年内可能用到，优先降低权益和高波动资产。${techNote}${propertyNote}`;
   }
 
   if (volatilityGap < -0.025) {
-    return `一句话诊断：你的金融资产比当前目标更保守，预期波动低 ${percentFormatter.format(Math.abs(volatilityGap))}，但长期收益弹性也可能偏低。${propertyNote}`;
+    return `一句话诊断：你的金融资产比当前目标更保守，预期波动低 ${percentFormatter.format(Math.abs(volatilityGap))}，但长期收益弹性也可能偏低。${techNote}${propertyNote}`;
   }
 
   if (returnGap < -0.008) {
-    return `一句话诊断：你的金融资产风险接近目标，但预期收益略低。可以检查现金类和固收类是否占比过高。${propertyNote}`;
+    return `一句话诊断：你的金融资产风险接近目标，但预期收益略低。可以检查现金类和固收类是否占比过高。${techNote}${propertyNote}`;
   }
 
-  return `一句话诊断：你的金融资产和当前目标组合接近，下一步重点是定期记录和小幅再平衡，而不是频繁交易。${propertyNote}`;
+  return `一句话诊断：你的金融资产和当前目标组合接近，下一步重点是定期记录和小幅再平衡，而不是频繁交易。${techNote}${propertyNote}`;
 }
 
 function recommendedPortfolioId() {
