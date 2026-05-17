@@ -485,6 +485,34 @@ select {
   .app-shell {
     grid-template-columns: 1fr;
   }
+
+  .content-column {
+    display: contents;
+  }
+
+  .input-panel {
+    order: 1;
+  }
+
+  .target-panel {
+    order: 2;
+  }
+
+  .summary-panel {
+    order: 3;
+  }
+
+  .rebalance-panel {
+    order: 4;
+  }
+
+  .history-panel {
+    order: 5;
+  }
+
+  .insight-panel {
+    order: 6;
+  }
 }
 
 @media (max-width: 680px) {
