@@ -154,16 +154,16 @@ export const portfolios = [
   }
 ];
 
-export const sampleAssets = {
-  demandCash: 80000,
-  moneyFund: 50000,
-  bonds: 120000,
-  chinaEquity: 80000,
-  hkChinaEquity: 30000,
-  overseasEquity: 20000,
-  gold: 40000,
-  reits: 10000,
-  pensionInsurance: 100000,
-  property: 1800000,
+export const emptyAssets = {
+  demandCash: 0,
+  moneyFund: 0,
+  bonds: 0,
+  chinaEquity: 0,
+  hkChinaEquity: 0,
+  overseasEquity: 0,
+  gold: 0,
+  reits: 0,
+  pensionInsurance: 0,
+  property: 0,
   other: 0
 };

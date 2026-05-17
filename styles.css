@@ -364,6 +364,15 @@ select {
   line-height: 1.45;
 }
 
+.empty-state {
+  padding: 16px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
 .metric-card {
   min-height: 88px;
   padding: 12px;

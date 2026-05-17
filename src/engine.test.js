@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { assetClasses, portfolios, sampleAssets } from "./data.js";
+import { assetClasses, emptyAssets, portfolios } from "./data.js";
 import {
   normalizeInvestableTargetWeights,
   portfolioStats,
@@ -21,19 +21,33 @@ for (const portfolio of portfolios) {
   assert.ok(stats.volatility >= 0, `${portfolio.name} volatility should not be negative`);
 }
 
-const totalAssets = sumAssets(sampleAssets);
-assert.equal(totalAssets, 2330000, "sample household asset total should match demo value");
+const testAssets = {
+  ...emptyAssets,
+  demandCash: 80000,
+  moneyFund: 50000,
+  bonds: 120000,
+  chinaEquity: 80000,
+  hkChinaEquity: 30000,
+  overseasEquity: 20000,
+  gold: 40000,
+  reits: 10000,
+  pensionInsurance: 100000,
+  property: 1800000
+};
 
-const currentWeights = weightsFromInvestableAssets(sampleAssets);
+const totalAssets = sumAssets(testAssets);
+assert.equal(totalAssets, 2330000, "test household asset total should match fixture value");
+
+const currentWeights = weightsFromInvestableAssets(testAssets);
 const currentInvestableWeightSum = investableAssetIds.reduce((sum, id) => sum + currentWeights[id], 0);
 assert.ok(Math.abs(currentInvestableWeightSum - 1) < 0.000001, "current investable weights should sum to 100%");
 
 for (const portfolio of portfolios) {
-  const rows = rebalanceRows(sampleAssets, portfolio.weights);
+  const rows = rebalanceRows(testAssets, portfolio.weights);
   const targetAmountSum = rows
     .filter((row) => row.rebalanceable)
     .reduce((sum, row) => sum + row.targetAmount, 0);
-  const investableTotal = investableAssetIds.reduce((sum, id) => sum + sampleAssets[id], 0);
+  const investableTotal = investableAssetIds.reduce((sum, id) => sum + testAssets[id], 0);
 
   assert.ok(Math.abs(targetAmountSum - investableTotal) < 0.01, `${portfolio.name} target amounts should fully allocate investable assets`);
 }

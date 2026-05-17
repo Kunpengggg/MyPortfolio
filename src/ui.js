@@ -1,4 +1,4 @@
-import { assetClasses, portfolios, sampleAssets } from "./data.js";
+import { assetClasses, emptyAssets, portfolios } from "./data.js";
 import {
   normalizeInvestableTargetWeights,
   portfolioStats,
@@ -11,7 +11,7 @@ import {
 import { clearSnapshots, deleteSnapshot, loadSnapshots, saveSnapshot } from "./store.js";
 
 const state = {
-  assets: { ...sampleAssets },
+  assets: { ...emptyAssets },
   portfolioId: "cnBalanced",
   snapshots: loadSnapshots()
 };
@@ -68,6 +68,16 @@ function renderInputs() {
       `;
     })
     .join("");
+}
+
+function hasInputAssets() {
+  return sumAssets(state.assets) > 0;
+}
+
+function hasInvestableAssets() {
+  return assetClasses
+    .filter((asset) => asset.rebalanceable)
+    .some((asset) => Number(state.assets[asset.id] || 0) > 0);
 }
 
 function renderPortfolioCards() {
@@ -136,6 +146,24 @@ function renderSummary() {
   const currentStats = portfolioStats(weightsFromInvestableAssets(state.assets));
   const targetStats = portfolioStats(normalizeInvestableTargetWeights(selectedPortfolio().weights));
   nodes.totalAssets.textContent = formatter.format(total);
+
+  if (!hasInputAssets()) {
+    nodes.riskLabel.textContent = "待录入";
+    nodes.diagnosis.textContent = "录入资产后，这里会生成一句话诊断，帮助你判断当前配置偏保守、偏激进，还是接近目标。";
+    nodes.metrics.innerHTML = [
+      ["当前预期收益", "-"],
+      ["当前波动率", "-"],
+      ["目标波动率", percentFormatter.format(targetStats.volatility)],
+      ["目标预期收益", percentFormatter.format(targetStats.expectedReturn)],
+      ["收益/波动", targetStats.score.toFixed(2)],
+      ["组合差异", "-"]
+    ]
+      .map(([label, value]) => `<div class="metric-card"><span>${label}</span><strong>${value}</strong></div>`)
+      .join("");
+    renderScenarioTable(targetStats);
+    return;
+  }
+
   nodes.riskLabel.textContent = riskLevel(currentStats.volatility);
   nodes.diagnosis.textContent = diagnosisText(currentStats, targetStats, state.assets);
 
@@ -150,6 +178,10 @@ function renderSummary() {
     .map(([label, value]) => `<div class="metric-card"><span>${label}</span><strong>${value}</strong></div>`)
     .join("");
 
+  renderScenarioTable(targetStats);
+}
+
+function renderScenarioTable(targetStats) {
   nodes.scenarioTable.innerHTML = `
     <div class="scenario-row"><span>目标组合情景</span><span>收益</span><span>波动</span></div>
     ${scenarios(targetStats)
@@ -167,6 +199,11 @@ function renderSummary() {
 }
 
 function renderRebalance() {
+  if (!hasInvestableAssets()) {
+    nodes.rebalanceList.innerHTML = `<div class="empty-state">录入现金、固收、权益、黄金等可投资金融资产后，这里会显示目标金额和分批调整建议。房产、保险和养老金会作为观察项展示。</div>`;
+    return;
+  }
+
   const rows = rebalanceRows(state.assets, selectedPortfolio().weights).sort((a, b) => b.absDelta - a.absDelta);
   nodes.rebalanceList.innerHTML = rows
     .filter((row) => row.currentAmount > 0 || row.targetWeight > 0)
@@ -310,7 +347,7 @@ function bindEvents() {
   });
 
   nodes.resetBtn.addEventListener("click", () => {
-    state.assets = { ...sampleAssets };
+    state.assets = { ...emptyAssets };
     renderInputs();
     renderAll();
   });
