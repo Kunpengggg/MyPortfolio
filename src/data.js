@@ -300,10 +300,10 @@ export const portfolios = [
 export const emptyAssets = Object.fromEntries(assetClasses.map((asset) => [asset.id, 0]));
 
 export const currencies = [
-  { code: "CNY", name: "人民币", symbol: "¥", rateToCny: 1 },
-  { code: "USD", name: "美元", symbol: "$", rateToCny: 6.82 },
-  { code: "HKD", name: "港币", symbol: "HK$", rateToCny: 0.87 },
-  { code: "EUR", name: "欧元", symbol: "€", rateToCny: 8.05 }
+  { code: "CNY", name: "人民币", symbol: "¥", rateToCny: 1, volatility: 0 },
+  { code: "USD", name: "美元", symbol: "$", rateToCny: 6.82, volatility: 0.06 },
+  { code: "HKD", name: "港币", symbol: "HK$", rateToCny: 0.87, volatility: 0.055 },
+  { code: "EUR", name: "欧元", symbol: "€", rateToCny: 8.05, volatility: 0.08 }
 ];
 
 export const defaultAssetCurrencies = Object.fromEntries(assetClasses.map((asset) => [asset.id, "CNY"]));

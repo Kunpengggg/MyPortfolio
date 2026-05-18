@@ -1,6 +1,7 @@
-import { assetClasses, groupCorrelation, returnProfiles } from "./data.js?v=20260518-return-profiles";
+import { assetClasses, currencies, groupCorrelation, returnProfiles } from "./data.js?v=20260518-return-profiles";
 
 const byId = Object.fromEntries(assetClasses.map((asset) => [asset.id, asset]));
+const currencyByCode = Object.fromEntries(currencies.map((currency) => [currency.code, currency]));
 
 export function sumAssets(assets) {
   return Object.values(assets).reduce((sum, value) => sum + normalizeNumber(value), 0);
@@ -47,7 +48,7 @@ export function normalizeInvestableTargetWeights(weights) {
   );
 }
 
-export function portfolioStats(weights, returnProfileId = "base") {
+export function portfolioStats(weights, returnProfileId = "base", currencyWeights = {}) {
   const fullWeights = normalizeWeights(weights);
   const expectedReturn = assetClasses.reduce((sum, asset) => {
     return sum + fullWeights[asset.id] * expectedReturnFor(asset, returnProfileId);
@@ -59,15 +60,19 @@ export function portfolioStats(weights, returnProfileId = "base") {
       variance +=
         fullWeights[left.id] *
         fullWeights[right.id] *
-        byId[left.id].volatility *
-        byId[right.id].volatility *
+        volatilityFor(left, currencyWeights) *
+        volatilityFor(right, currencyWeights) *
         correlationFor(left, right);
     }
   }
 
   const volatility = Math.sqrt(Math.max(variance, 0));
+  const geometricReturn = expectedGeometricReturn(expectedReturn, volatility);
+  const stressLoss = Math.max(0, volatility * 1.65 - expectedReturn);
   return {
     expectedReturn,
+    geometricReturn,
+    stressLoss,
     volatility,
     score: volatility > 0 ? expectedReturn / volatility : 0
   };
@@ -76,6 +81,24 @@ export function portfolioStats(weights, returnProfileId = "base") {
 function expectedReturnFor(asset, returnProfileId) {
   const profile = returnProfiles.find((item) => item.id === returnProfileId);
   return profile?.expectedReturns?.[asset.id] ?? asset.expectedReturn;
+}
+
+function volatilityFor(asset, currencyWeights) {
+  const currencyVolatility = currencyRiskFor(asset.id, currencyWeights);
+  return Math.sqrt(asset.volatility ** 2 + currencyVolatility ** 2);
+}
+
+function currencyRiskFor(assetId, currencyWeights) {
+  const weights = currencyWeights?.[assetId] || {};
+  return Object.entries(weights).reduce((sum, [code, weight]) => {
+    const currency = currencyByCode[code];
+    if (!currency || code === "CNY") return sum;
+    return sum + weight * (currency.volatility || 0);
+  }, 0);
+}
+
+function expectedGeometricReturn(expectedReturn, volatility) {
+  return Math.max(-0.99, expectedReturn - 0.5 * volatility ** 2);
 }
 
 function correlationFor(left, right) {
@@ -120,17 +143,17 @@ export function scenarios(stats) {
   return [
     {
       name: "稳健情景",
-      expectedReturn: stats.expectedReturn * 0.85,
+      expectedReturn: stats.geometricReturn * 0.9,
       volatility: stats.volatility * 0.9
     },
     {
       name: "均衡情景",
-      expectedReturn: stats.expectedReturn,
+      expectedReturn: stats.geometricReturn,
       volatility: stats.volatility
     },
     {
       name: "进取情景",
-      expectedReturn: stats.expectedReturn * 1.15,
+      expectedReturn: stats.expectedReturn,
       volatility: stats.volatility * 1.12
     }
   ];

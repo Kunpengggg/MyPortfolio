@@ -17,6 +17,9 @@ for (const portfolio of portfolios) {
 
   assert.ok(Math.abs(investableWeightSum - 1) < 0.000001, `${portfolio.name} investable weights should sum to 100%`);
   assert.ok(Number.isFinite(stats.expectedReturn), `${portfolio.name} expected return should be finite`);
+  assert.ok(Number.isFinite(stats.geometricReturn), `${portfolio.name} geometric return should be finite`);
+  assert.ok(stats.geometricReturn <= stats.expectedReturn, `${portfolio.name} geometric return should not exceed nominal return`);
+  assert.ok(Number.isFinite(stats.stressLoss), `${portfolio.name} stress loss should be finite`);
   assert.ok(Number.isFinite(stats.volatility), `${portfolio.name} volatility should be finite`);
   assert.ok(stats.volatility >= 0, `${portfolio.name} volatility should not be negative`);
 }
@@ -74,6 +77,18 @@ assert.ok(soloMaxStats.expectedReturn >= 0.1, "solo max growth portfolio should 
 assert.ok(highReturnVolatility <= soloMaxStats.volatility, "solo max growth portfolio should be at least as volatile as high-return portfolio");
 assert.ok(soloConservativeStats.expectedReturn < soloMaxStats.expectedReturn, "conservative profile should reduce expected returns");
 assert.ok(soloOptimisticStats.expectedReturn > soloMaxStats.expectedReturn, "tech optimistic profile should increase expected returns");
+
+const usdCurrencyStats = portfolioStats(
+  { ...emptyAssets, usTechGrowth: 1 },
+  "base",
+  { usTechGrowth: { USD: 1 } }
+);
+const cnyCurrencyStats = portfolioStats(
+  { ...emptyAssets, usTechGrowth: 1 },
+  "base",
+  { usTechGrowth: { CNY: 1 } }
+);
+assert.ok(usdCurrencyStats.volatility > cnyCurrencyStats.volatility, "USD holdings should include additional currency volatility");
 
 const balanced = portfolios.find((item) => item.id === "cnBalanced");
 const highReturn = portfolios.find((item) => item.id === "cnHighReturn");

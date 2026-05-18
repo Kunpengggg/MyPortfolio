@@ -78,6 +78,16 @@ function convertAssetsToCny(assets, assetCurrencies = state.assetCurrencies) {
   );
 }
 
+function assetCurrencyWeights(assets, assetCurrencies = state.assetCurrencies) {
+  const convertedAssets = convertAssetsToCny(assets, assetCurrencies);
+  return Object.fromEntries(
+    assetClasses.map((asset) => {
+      const code = currencyFor(assetCurrencies?.[asset.id]).code;
+      return [asset.id, convertedAssets[asset.id] > 0 ? { [code]: 1 } : {}];
+    })
+  );
+}
+
 function migrateAssetCurrencies(assetCurrencies) {
   const migrated = createDefaultAssetCurrencies();
   for (const asset of assetClasses) {
@@ -214,7 +224,11 @@ function renderTarget() {
 function renderSummary() {
   const convertedAssets = convertAssetsToCny(state.assets);
   const total = sumAssets(convertedAssets);
-  const currentStats = portfolioStats(weightsFromInvestableAssets(convertedAssets), state.returnProfileId);
+  const currentStats = portfolioStats(
+    weightsFromInvestableAssets(convertedAssets),
+    state.returnProfileId,
+    assetCurrencyWeights(state.assets)
+  );
   const targetStats = portfolioStats(normalizeInvestableTargetWeights(selectedPortfolio().weights), state.returnProfileId);
   nodes.returnProfileDescription.textContent = selectedReturnProfile().description;
   nodes.totalAssets.textContent = formatter.format(total);
@@ -224,14 +238,16 @@ function renderSummary() {
     nodes.diagnosis.textContent = "录入资产后，这里会生成一句话诊断，帮助你判断当前配置偏保守、偏激进，还是接近目标。";
     nodes.metrics.innerHTML = comparisonHtml({
       currentItems: [
-        ["预期收益", "-"],
+        ["名义年化", "-"],
+        ["复合年化", "-"],
         ["波动率", "-"],
-        ["收益/波动", "-"]
+        ["压力下跌", "-"]
       ],
       targetItems: [
-        ["预期收益", percentFormatter.format(targetStats.expectedReturn)],
+        ["名义年化", percentFormatter.format(targetStats.expectedReturn)],
+        ["复合年化", percentFormatter.format(targetStats.geometricReturn)],
         ["波动率", percentFormatter.format(targetStats.volatility)],
-        ["收益/波动", targetStats.score.toFixed(2)]
+        ["压力下跌", `-${percentFormatter.format(targetStats.stressLoss)}`]
       ],
       gap: "-"
     });
@@ -244,14 +260,16 @@ function renderSummary() {
 
   nodes.metrics.innerHTML = comparisonHtml({
     currentItems: [
-      ["预期收益", percentFormatter.format(currentStats.expectedReturn)],
+      ["名义年化", percentFormatter.format(currentStats.expectedReturn)],
+      ["复合年化", percentFormatter.format(currentStats.geometricReturn)],
       ["波动率", percentFormatter.format(currentStats.volatility)],
-      ["收益/波动", currentStats.score.toFixed(2)]
+      ["压力下跌", `-${percentFormatter.format(currentStats.stressLoss)}`]
     ],
     targetItems: [
-      ["预期收益", percentFormatter.format(targetStats.expectedReturn)],
+      ["名义年化", percentFormatter.format(targetStats.expectedReturn)],
+      ["复合年化", percentFormatter.format(targetStats.geometricReturn)],
       ["波动率", percentFormatter.format(targetStats.volatility)],
-      ["收益/波动", targetStats.score.toFixed(2)]
+      ["压力下跌", `-${percentFormatter.format(targetStats.stressLoss)}`]
     ],
     gap: percentFormatter.format(Math.abs(targetStats.volatility - currentStats.volatility))
   });
@@ -359,9 +377,11 @@ function renderRebalance() {
 
   const convertedAssets = convertAssetsToCny(state.assets);
   const rows = rebalanceRows(convertedAssets, selectedPortfolio().weights).sort((a, b) => b.absDelta - a.absDelta);
+  const actionableRows = rows.filter((row) => row.rebalanceable && (row.currentAmount > 0 || row.targetWeight > 0));
   nodes.rebalanceList.innerHTML = rows
     .filter((row) => row.rebalanceable && (row.currentAmount > 0 || row.targetWeight > 0))
     .map((row) => {
+      const priority = priorityForRow(row, actionableRows);
       const deltaClass = row.delta >= 0 ? "delta-positive" : "delta-negative";
       const action = row.delta >= 0 ? "增加" : "减少";
       const deltaText = row.rebalanceable
@@ -376,7 +396,7 @@ function renderRebalance() {
         <div class="rebalance-item">
           <div>
             <strong>${row.name}</strong>
-            <span class="rebalance-sub">${currentWeightText} → 目标 ${targetWeightText}</span>
+            <span class="rebalance-sub"><span class="priority-pill">${priority}</span>${currentWeightText} → 目标 ${targetWeightText}</span>
           </div>
           <span>${formatter.format(row.currentAmount)}</span>
           <span>${targetText}</span>
@@ -388,6 +408,14 @@ function renderRebalance() {
       `;
     })
     .join("");
+}
+
+function priorityForRow(row, rows) {
+  const sorted = [...rows].sort((left, right) => right.absDelta - left.absDelta);
+  const rank = sorted.findIndex((item) => item.id === row.id);
+  if (rank < 3 && row.absDelta > 0) return "优先";
+  if (row.absDelta > 0) return "次要";
+  return "观察";
 }
 
 function diagnosisText(currentStats, targetStats, assets) {
