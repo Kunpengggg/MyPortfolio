@@ -289,18 +289,18 @@ function comparisonHtml({ currentItems, targetItems, gap }) {
   return `
     <div class="comparison-column">
       <h3>当前配置</h3>
-      ${currentItems.map(([label, value]) => metricCardHtml(label, value)).join("")}
+      ${currentItems.map(([label, value]) => metricCardHtml(label, value, false)).join("")}
     </div>
     <div class="comparison-column target-column">
       <h3>目标配置</h3>
-      ${targetItems.map(([label, value]) => metricCardHtml(label, value)).join("")}
+      ${targetItems.map(([label, value]) => metricCardHtml(label, value, true)).join("")}
     </div>
     <div class="comparison-gap"><span>波动差异</span><strong>${gap}</strong></div>
   `;
 }
 
-function metricCardHtml(label, value) {
-  const help = metricHelp[label];
+function metricCardHtml(label, value, showHelp) {
+  const help = showHelp ? metricHelp[label] : "";
   return `
     <div class="metric-card">
       <span class="metric-label">

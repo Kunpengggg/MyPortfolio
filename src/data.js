@@ -212,7 +212,7 @@ export const returnProfiles = [
   },
   {
     id: "techOptimistic",
-    name: "成长强化",
+    name: "高增长假设",
     description: "提高美股科技和 AI 成长资产的长期收益假设，但不代表收益承诺。",
     expectedReturns: {
       chinaBroadIndex: 0.08,
