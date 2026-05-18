@@ -27,16 +27,10 @@
               <h2 id="assetInputTitle">录入家庭资产</h2>
             </div>
             <div class="heading-actions">
-              <details class="asset-help">
-                <summary>美股分类提示</summary>
-                <div>
-                  <p>标普500、美国全市场、普通美股 QDII 放在“美国核心宽基”。</p>
-                  <p>纳指100、AI、科技成长类基金放在“美股科技卫星”。</p>
-                </div>
-              </details>
               <p id="totalAssets" class="total-pill">$0</p>
             </div>
           </div>
+          <p class="currency-note">每项资产可单独选择币种，系统统一按参考汇率折算为人民币。</p>
           <div id="assetInputs" class="asset-grid"></div>
         </section>
 
@@ -49,12 +43,20 @@
           </div>
           <div class="chart-grid">
             <div class="chart-block">
-              <h3>家庭总资产</h3>
+              <div class="chart-title-row">
+                <h3>家庭总资产</h3>
+              </div>
               <div id="totalPie" class="pie-chart" role="img" aria-label="家庭总资产占比图"></div>
               <div id="totalLegend" class="chart-legend"></div>
             </div>
             <div class="chart-block">
-              <h3>可投资金融资产</h3>
+              <div class="chart-title-row">
+                <h3>可投资金融资产</h3>
+                <details class="info-popover">
+                  <summary aria-label="可投资金融资产说明">i</summary>
+                  <p>只包含现金、固收、基金、股票、黄金、REITs 等可以直接调仓的金融资产；不包含房产、保险、养老金和其他观察项。</p>
+                </details>
+              </div>
               <div id="investablePie" class="pie-chart" role="img" aria-label="可投资金融资产占比图"></div>
               <div id="investableLegend" class="chart-legend"></div>
             </div>
@@ -78,9 +80,9 @@
           <div class="section-heading">
             <div>
               <p class="eyebrow">Step 4</p>
-              <h2 id="rebalanceTitle">加减建议</h2>
+              <h2 id="rebalanceTitle">资产调配建议</h2>
             </div>
-            <p class="muted">按可投资金融资产估算</p>
+            <p class="muted">只显示可调仓金融资产；房产、保险/养老金、其他资产在总资产图中观察</p>
           </div>
           <div id="rebalanceList" class="rebalance-list"></div>
         </section>
@@ -95,7 +97,7 @@
             </div>
           </div>
           <div class="portfolio-guidance">
-            <strong>默认建议：国内均衡配置</strong>
+            <strong>默认建议：均衡增长</strong>
             <span>如果你不确定怎么选，先用它。下面按波动率从低到高排列，越往下通常收益弹性越高、账户起伏也越大。</span>
           </div>
           <div class="model-note">
@@ -132,7 +134,7 @@
                 <option value="growth">长期增长</option>
               </select>
             </label>
-            <p id="recommendationResult" class="recommendation-result">不确定就先选“国内均衡配置”。</p>
+            <p id="recommendationResult" class="recommendation-result">不确定就先选“均衡增长”。</p>
           </div>
           <div id="portfolioCards" class="portfolio-cards" role="radiogroup" aria-label="目标组合模板"></div>
           <div id="portfolioDescription" class="portfolio-description"></div>
@@ -159,7 +161,8 @@
           </div>
           <div class="insight-copy">
             <p>你的数据只保存在当前浏览器本地，不会上传到服务器。换设备、清理浏览器数据或无痕模式可能导致历史记录消失。</p>
-            <p>房产、保险和养老金会纳入总资产观察，但不会参与直接调仓建议；加减建议只针对现金、固收、权益、黄金等可投资金融资产。</p>
+            <p>币种会按页面内置参考汇率折算为人民币，实际买卖汇率、银行点差和基金结算汇率可能不同。</p>
+            <p>房产、保险和养老金会纳入总资产观察，但不会参与直接调仓建议；资产调配建议只针对现金、固收、权益、黄金等可投资金融资产。</p>
             <p>模型参考长期资本市场假设、历史指数表现和中国家庭资产结构。美国核心宽基代表相对分散的美股主仓，科技成长卫星代表更高集中度和更高波动的增强仓。</p>
             <p class="disclaimer">结果仅供教育和个人规划参考，不构成投资、税务或法律建议。境内基金、理财、保险、房产等资产存在不同流动性、税费和监管约束，历史数据和资本市场假设不保证未来结果。</p>
           </div>

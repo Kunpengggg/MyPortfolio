@@ -1,4 +1,4 @@
-import { assetClasses, emptyAssets, portfolios } from "./data.js";
+import { assetClasses, currencies, defaultAssetCurrencies, emptyAssets, portfolios } from "./data.js";
 import {
   normalizeInvestableTargetWeights,
   portfolioStats,
@@ -12,6 +12,7 @@ import { clearSnapshots, deleteSnapshot, loadSnapshots, saveSnapshot } from "./s
 
 const state = {
   assets: createEmptyAssets(),
+  assetCurrencies: createDefaultAssetCurrencies(),
   portfolioId: "cnBalanced",
   snapshots: loadSnapshots()
 };
@@ -57,6 +58,31 @@ function createEmptyAssets() {
   return { ...emptyAssets };
 }
 
+function createDefaultAssetCurrencies() {
+  return { ...defaultAssetCurrencies };
+}
+
+function currencyFor(code) {
+  return currencies.find((currency) => currency.code === code) || currencies[0];
+}
+
+function convertAssetsToCny(assets, assetCurrencies = state.assetCurrencies) {
+  return Object.fromEntries(
+    assetClasses.map((asset) => {
+      const rawAmount = Number(assets?.[asset.id] || 0);
+      return [asset.id, rawAmount * currencyFor(assetCurrencies?.[asset.id]).rateToCny];
+    })
+  );
+}
+
+function migrateAssetCurrencies(assetCurrencies) {
+  const migrated = createDefaultAssetCurrencies();
+  for (const asset of assetClasses) {
+    migrated[asset.id] = currencyFor(assetCurrencies?.[asset.id]).code;
+  }
+  return migrated;
+}
+
 function migrateAssets(assets) {
   const migrated = createEmptyAssets();
   for (const asset of assetClasses) {
@@ -82,27 +108,51 @@ function renderInputs() {
   nodes.assetInputs.innerHTML = assetClasses
     .map((asset) => {
       const value = state.assets[asset.id] || "";
+      const selectedCurrency = currencyFor(state.assetCurrencies[asset.id]);
+      const currencyOptions = currencies
+        .map(
+          (currency) =>
+            `<option value="${currency.code}" ${currency.code === selectedCurrency.code ? "selected" : ""}>${currency.code}</option>`
+        )
+        .join("");
+      const helpRow =
+        asset.id === "usTechGrowth"
+          ? `
+        <details class="asset-help asset-help-row">
+          <summary>美股分类提示</summary>
+          <div>
+            <p>标普500、美国全市场、普通美股 QDII 放在“美国核心宽基”。</p>
+            <p>纳指100、AI、科技成长类基金放在“美股科技卫星”。</p>
+          </div>
+        </details>
+      `
+          : "";
       return `
         <label class="asset-row">
           <span>
             <span class="asset-name">${asset.name}${asset.role ? `<span class="asset-role">${asset.role}</span>` : ""}</span>
             <span class="asset-meta">${asset.hint}</span>
           </span>
-          <input data-asset-id="${asset.id}" type="number" min="0" step="100" value="${value}" aria-label="${asset.name}金额" />
+          <span class="asset-input-group">
+            <input data-asset-id="${asset.id}" type="number" min="0" step="100" value="${value}" aria-label="${asset.name}金额" />
+            <select data-currency-id="${asset.id}" aria-label="${asset.name}币种">${currencyOptions}</select>
+          </span>
         </label>
+        ${helpRow}
       `;
     })
     .join("");
 }
 
 function hasInputAssets() {
-  return sumAssets(state.assets) > 0;
+  return sumAssets(convertAssetsToCny(state.assets)) > 0;
 }
 
 function hasInvestableAssets() {
+  const convertedAssets = convertAssetsToCny(state.assets);
   return assetClasses
     .filter((asset) => asset.rebalanceable)
-    .some((asset) => Number(state.assets[asset.id] || 0) > 0);
+    .some((asset) => Number(convertedAssets[asset.id] || 0) > 0);
 }
 
 function renderPortfolioCards() {
@@ -168,43 +218,64 @@ function renderTarget() {
 }
 
 function renderSummary() {
-  const total = sumAssets(state.assets);
-  const currentStats = portfolioStats(weightsFromInvestableAssets(state.assets));
+  const convertedAssets = convertAssetsToCny(state.assets);
+  const total = sumAssets(convertedAssets);
+  const currentStats = portfolioStats(weightsFromInvestableAssets(convertedAssets));
   const targetStats = portfolioStats(normalizeInvestableTargetWeights(selectedPortfolio().weights));
   nodes.totalAssets.textContent = formatter.format(total);
 
   if (!hasInputAssets()) {
     nodes.riskLabel.textContent = `目标：${riskLevel(targetStats.volatility)}`;
     nodes.diagnosis.textContent = "录入资产后，这里会生成一句话诊断，帮助你判断当前配置偏保守、偏激进，还是接近目标。";
-    nodes.metrics.innerHTML = [
-      ["当前预期收益", "-"],
-      ["当前波动率", "-"],
-      ["目标波动率", percentFormatter.format(targetStats.volatility)],
-      ["目标预期收益", percentFormatter.format(targetStats.expectedReturn)],
-      ["收益/波动", targetStats.score.toFixed(2)],
-      ["组合差异", "-"]
-    ]
-      .map(([label, value]) => `<div class="metric-card"><span>${label}</span><strong>${value}</strong></div>`)
-      .join("");
+    nodes.metrics.innerHTML = comparisonHtml({
+      currentItems: [
+        ["预期收益", "-"],
+        ["波动率", "-"],
+        ["收益/波动", "-"]
+      ],
+      targetItems: [
+        ["预期收益", percentFormatter.format(targetStats.expectedReturn)],
+        ["波动率", percentFormatter.format(targetStats.volatility)],
+        ["收益/波动", targetStats.score.toFixed(2)]
+      ],
+      gap: "-"
+    });
     renderScenarioTable(targetStats);
     return;
   }
 
   nodes.riskLabel.textContent = `目标：${riskLevel(targetStats.volatility)}`;
-  nodes.diagnosis.textContent = diagnosisText(currentStats, targetStats, state.assets);
+  nodes.diagnosis.textContent = diagnosisText(currentStats, targetStats, convertedAssets);
 
-  nodes.metrics.innerHTML = [
-    ["当前预期收益", percentFormatter.format(currentStats.expectedReturn)],
-    ["当前波动率", percentFormatter.format(currentStats.volatility)],
-    ["目标波动率", percentFormatter.format(targetStats.volatility)],
-    ["目标预期收益", percentFormatter.format(targetStats.expectedReturn)],
-    ["收益/波动", targetStats.score.toFixed(2)],
-    ["组合差异", percentFormatter.format(Math.abs(targetStats.volatility - currentStats.volatility))]
-  ]
-    .map(([label, value]) => `<div class="metric-card"><span>${label}</span><strong>${value}</strong></div>`)
-    .join("");
+  nodes.metrics.innerHTML = comparisonHtml({
+    currentItems: [
+      ["预期收益", percentFormatter.format(currentStats.expectedReturn)],
+      ["波动率", percentFormatter.format(currentStats.volatility)],
+      ["收益/波动", currentStats.score.toFixed(2)]
+    ],
+    targetItems: [
+      ["预期收益", percentFormatter.format(targetStats.expectedReturn)],
+      ["波动率", percentFormatter.format(targetStats.volatility)],
+      ["收益/波动", targetStats.score.toFixed(2)]
+    ],
+    gap: percentFormatter.format(Math.abs(targetStats.volatility - currentStats.volatility))
+  });
 
   renderScenarioTable(targetStats);
+}
+
+function comparisonHtml({ currentItems, targetItems, gap }) {
+  return `
+    <div class="comparison-column">
+      <h3>当前配置</h3>
+      ${currentItems.map(([label, value]) => `<div class="metric-card"><span>${label}</span><strong>${value}</strong></div>`).join("")}
+    </div>
+    <div class="comparison-column target-column">
+      <h3>目标配置</h3>
+      ${targetItems.map(([label, value]) => `<div class="metric-card"><span>${label}</span><strong>${value}</strong></div>`).join("")}
+    </div>
+    <div class="comparison-gap"><span>波动差异</span><strong>${gap}</strong></div>
+  `;
 }
 
 function renderPieCharts() {
@@ -224,10 +295,11 @@ function renderPieCharts() {
 }
 
 function renderPieChart({ assets, container, legend, emptyText }) {
+  const convertedAssets = convertAssetsToCny(state.assets);
   const rows = assets
     .map((asset) => ({
       ...asset,
-      amount: Number(state.assets[asset.id] || 0)
+      amount: Number(convertedAssets[asset.id] || 0)
     }))
     .filter((asset) => asset.amount > 0);
   const total = rows.reduce((sum, asset) => sum + asset.amount, 0);
@@ -286,13 +358,14 @@ function renderScenarioTable(targetStats) {
 
 function renderRebalance() {
   if (!hasInvestableAssets()) {
-    nodes.rebalanceList.innerHTML = `<div class="empty-state">录入现金、固收、权益、黄金等可投资金融资产后，这里会显示目标金额和分批调整建议。房产、保险和养老金会作为观察项展示。</div>`;
+    nodes.rebalanceList.innerHTML = `<div class="empty-state">录入现金、固收、权益、黄金等可投资金融资产后，这里会显示目标金额和分批调配建议。房产、保险、养老金和其他观察项不会出现在本步骤。</div>`;
     return;
   }
 
-  const rows = rebalanceRows(state.assets, selectedPortfolio().weights).sort((a, b) => b.absDelta - a.absDelta);
+  const convertedAssets = convertAssetsToCny(state.assets);
+  const rows = rebalanceRows(convertedAssets, selectedPortfolio().weights).sort((a, b) => b.absDelta - a.absDelta);
   nodes.rebalanceList.innerHTML = rows
-    .filter((row) => row.currentAmount > 0 || row.targetWeight > 0)
+    .filter((row) => row.rebalanceable && (row.currentAmount > 0 || row.targetWeight > 0))
     .map((row) => {
       const deltaClass = row.delta >= 0 ? "delta-positive" : "delta-negative";
       const action = row.delta >= 0 ? "增加" : "减少";
@@ -391,7 +464,7 @@ function renderHistory() {
         <div class="history-item">
           <div>
             <div class="history-title">${date}</div>
-            <div class="muted">${snapshot.portfolioName} · ${formatter.format(sumAssets(snapshot.assets))}</div>
+            <div class="muted">${snapshot.portfolioName} · ${formatter.format(sumAssets(convertAssetsToCny(snapshot.assets, snapshot.assetCurrencies)))}</div>
           </div>
           <div class="history-actions">
             <button data-load-id="${snapshot.id}" class="ghost-btn" type="button">加载</button>
@@ -419,6 +492,13 @@ function bindEvents() {
     renderAll();
   });
 
+  nodes.assetInputs.addEventListener("change", (event) => {
+    const assetId = event.target.dataset.currencyId;
+    if (!assetId) return;
+    state.assetCurrencies[assetId] = currencyFor(event.target.value).code;
+    renderAll();
+  });
+
   nodes.portfolioCards.addEventListener("click", (event) => {
     const card = event.target.closest("[data-portfolio-id]");
     if (!card) return;
@@ -436,13 +516,15 @@ function bindEvents() {
       createdAt: new Date().toISOString(),
       portfolioId: portfolio.id,
       portfolioName: portfolio.name,
-      assets: { ...state.assets }
+      assets: { ...state.assets },
+      assetCurrencies: { ...state.assetCurrencies }
     });
     renderHistory();
   });
 
   nodes.resetBtn.addEventListener("click", () => {
     state.assets = createEmptyAssets();
+    state.assetCurrencies = createDefaultAssetCurrencies();
     renderInputs();
     renderAll();
   });
@@ -460,6 +542,7 @@ function bindEvents() {
       const snapshot = state.snapshots.find((item) => item.id === loadId);
       if (!snapshot) return;
       state.assets = migrateAssets(snapshot.assets);
+      state.assetCurrencies = migrateAssetCurrencies(snapshot.assetCurrencies);
       state.portfolioId = snapshot.portfolioId;
       renderInputs();
       renderPortfolioCards();

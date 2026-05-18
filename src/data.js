@@ -103,8 +103,8 @@ export const assetClasses = [
   },
   {
     id: "globalExUsEquity",
-    name: "全球除美权益",
-    hint: "欧洲、日本、印度等非美市场基金",
+    name: "非美海外权益",
+    hint: "欧洲、日本、印度等海外市场基金，不含美国",
     expectedReturn: 0.052,
     volatility: 0.19,
     group: "globalExUsEquity",
@@ -183,7 +183,7 @@ export const groupCorrelation = {
 export const portfolios = [
   {
     id: "cnStable",
-    name: "国内稳健固收+",
+    name: "低波动防守",
     badge: "更稳",
     fit: "适合不想大幅波动、刚开始从存款转向基金/理财的人。",
     description: "面向中国普通家庭的低波动组合：保留现金流动性，以债券/固收为核心，用宽基、红利、美国核心宽基和黄金提升长期弹性。",
@@ -191,7 +191,7 @@ export const portfolios = [
   },
   {
     id: "cnBalanced",
-    name: "国内均衡配置",
+    name: "均衡增长",
     badge: "默认推荐",
     fit: "适合多数家庭的长期闲钱：希望比存款更有弹性，但不想把权益仓位拉太高。",
     description: "股债黄金多元配置，权益部分以 A股宽基、红利、美国核心宽基和纳指科技为主体，港股/中概只做小比例卫星仓。",
@@ -199,7 +199,7 @@ export const portfolios = [
   },
   {
     id: "cnGrowth",
-    name: "国内进取长期",
+    name: "稳中求进",
     badge: "收益潜力高",
     fit: "适合 5 年以上不用、能接受账户明显上下波动的钱。",
     description: "提高中美宽基和纳指科技占比，追求更高长期收益弹性；港股/中概保留低比例，用于估值修复机会而非重仓押注。",
@@ -207,7 +207,7 @@ export const portfolios = [
   },
   {
     id: "cnHighReturn",
-    name: "长期进取增长",
+    name: "高成长进取",
     badge: "高收益潜力",
     fit: "适合 5-10 年不用、能承受较大回撤，并愿意承担权益集中波动的人。",
     description: "更重视长期增值，把美国核心宽基、纳指科技和 A股宽基作为主体。行业主题和个股控制在可承受范围内，避免把高收益潜力变成单点押注。",
@@ -215,7 +215,7 @@ export const portfolios = [
   },
   {
     id: "soloMaxGrowth",
-    name: "全球科技进取 10%+",
+    name: "全球科技高增长 10%+",
     badge: "极高风险",
     fit: "适合现金流稳定、10 年以上不用、能承受 40% 以上回撤，并主动追求科技成长收益的人。",
     description: "这是历史乐观口径下的高风险增长模型，核心押注美国核心宽基和纳指/AI 科技成长，少量配置 A股、主题、个股和黄金。它可能长期高收益，也可能经历深度回撤和多年不赚钱。",
@@ -223,7 +223,7 @@ export const portfolios = [
   },
   {
     id: "cnIncome",
-    name: "现金流优先",
+    name: "短期现金管理",
     badge: "短中期",
     fit: "适合 1-3 年可能要用的钱，优先保留流动性和较低波动。",
     description: "强调流动性和较低波动，适合短中期目标资金或风险承受力较低的用户。黄金保留小比例用于通胀和地缘风险对冲。",
@@ -231,7 +231,7 @@ export const portfolios = [
   },
   {
     id: "cnRetirement",
-    name: "养老长期稳健",
+    name: "养老稳健账户",
     badge: "养老",
     fit: "适合为养老单独做账户的人，保险/养老金作为长期锁定资产观察。",
     description: "适合养老储备视角：把稳健资产作为主体，保留养老金/保险观察项，宽基、红利、美国核心宽基和黄金用于抗通胀与长期增值。",
@@ -239,7 +239,7 @@ export const portfolios = [
   },
   {
     id: "cnBarbell",
-    name: "杠铃型配置",
+    name: "安全垫 + 增长仓",
     badge: "攻守分明",
     fit: "适合想把安全垫和增长仓分得很清楚的人。",
     description: "一端是现金和债券，一端是宽基、红利、科技成长和黄金，中间少放，适合清晰区分安全垫和增长仓。",
@@ -248,3 +248,12 @@ export const portfolios = [
 ];
 
 export const emptyAssets = Object.fromEntries(assetClasses.map((asset) => [asset.id, 0]));
+
+export const currencies = [
+  { code: "CNY", name: "人民币", symbol: "¥", rateToCny: 1 },
+  { code: "USD", name: "美元", symbol: "$", rateToCny: 6.82 },
+  { code: "HKD", name: "港币", symbol: "HK$", rateToCny: 0.87 },
+  { code: "EUR", name: "欧元", symbol: "€", rateToCny: 8.05 }
+];
+
+export const defaultAssetCurrencies = Object.fromEntries(assetClasses.map((asset) => [asset.id, "CNY"]));

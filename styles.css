@@ -159,6 +159,13 @@ select {
   gap: 12px;
 }
 
+.currency-note {
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .model-note {
   display: grid;
   gap: 5px;
@@ -178,6 +185,11 @@ select {
 
 .asset-help {
   position: relative;
+}
+
+.asset-help-row {
+  grid-column: 1 / -1;
+  justify-self: start;
 }
 
 .asset-help summary {
@@ -215,13 +227,18 @@ select {
   line-height: 1.55;
 }
 
+.asset-help-row div {
+  left: 0;
+  right: auto;
+}
+
 .asset-help p + p {
   margin-top: 6px;
 }
 
 .asset-row {
   display: grid;
-  grid-template-columns: 1fr 130px;
+  grid-template-columns: 1fr 190px;
   gap: 10px;
   align-items: center;
   min-height: 70px;
@@ -257,13 +274,30 @@ select {
   font-size: 12px;
 }
 
-.asset-row input {
+.asset-input-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px;
+  gap: 8px;
+}
+
+.asset-input-group input,
+.asset-input-group select {
   width: 100%;
   min-height: 40px;
   padding: 0 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
+}
+
+.asset-input-group input {
   text-align: right;
+}
+
+.asset-input-group select {
+  min-height: 40px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .portfolio-description {
@@ -432,8 +466,23 @@ select {
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
+
+.comparison-column {
+  display: grid;
+  gap: 10px;
+}
+
+.comparison-column h3 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.target-column h3 {
+  color: var(--blue);
 }
 
 .chart-grid {
@@ -446,10 +495,61 @@ select {
   min-width: 0;
 }
 
+.chart-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
 .chart-block h3 {
   margin: 0 0 10px;
   font-size: 14px;
   letter-spacing: 0;
+}
+
+.chart-title-row h3 {
+  margin: 0;
+}
+
+.info-popover {
+  position: relative;
+}
+
+.info-popover summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 900;
+  list-style: none;
+  cursor: pointer;
+}
+
+.info-popover summary::-webkit-details-marker {
+  display: none;
+}
+
+.info-popover p {
+  position: absolute;
+  right: 0;
+  z-index: 4;
+  width: min(280px, calc(100vw - 28px));
+  margin: 8px 0 0;
+  padding: 10px;
+  border: 1px solid rgba(31, 111, 139, 0.2);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .pie-chart {
@@ -525,6 +625,27 @@ select {
   display: block;
   margin-top: 8px;
   font-size: 22px;
+}
+
+.comparison-gap {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f0f5f2;
+}
+
+.comparison-gap span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.comparison-gap strong {
+  font-size: 18px;
 }
 
 .scenario-table {
@@ -685,6 +806,10 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .asset-input-group {
+    grid-template-columns: 1fr 78px;
+  }
+
   .section-heading {
     align-items: flex-start;
     flex-direction: column;
@@ -702,6 +827,14 @@ select {
 
   select {
     width: 100%;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-gap {
+    grid-column: auto;
   }
 
   .portfolio-card-meta {
