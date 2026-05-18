@@ -183,59 +183,6 @@ select {
   font-size: 13px;
 }
 
-.asset-help {
-  position: relative;
-}
-
-.asset-help-row {
-  grid-column: 1 / -1;
-  justify-self: start;
-}
-
-.asset-help summary {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: #fbfcfa;
-  color: var(--blue);
-  font-size: 13px;
-  font-weight: 800;
-  list-style: none;
-  cursor: pointer;
-}
-
-.asset-help summary::-webkit-details-marker {
-  display: none;
-}
-
-.asset-help div {
-  position: absolute;
-  right: 0;
-  z-index: 5;
-  width: min(320px, calc(100vw - 28px));
-  margin-top: 8px;
-  padding: 12px;
-  border: 1px solid rgba(31, 111, 139, 0.2);
-  border-radius: 8px;
-  background: #ffffff;
-  box-shadow: var(--shadow);
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.asset-help-row div {
-  left: 0;
-  right: auto;
-}
-
-.asset-help p + p {
-  margin-top: 6px;
-}
-
 .asset-row {
   display: grid;
   grid-template-columns: 1fr 190px;
@@ -818,11 +765,6 @@ select {
   .heading-actions {
     width: 100%;
     justify-content: space-between;
-  }
-
-  .asset-help div {
-    left: 0;
-    right: auto;
   }
 
   select {

@@ -115,18 +115,6 @@ function renderInputs() {
             `<option value="${currency.code}" ${currency.code === selectedCurrency.code ? "selected" : ""}>${currency.code}</option>`
         )
         .join("");
-      const helpRow =
-        asset.id === "usTechGrowth"
-          ? `
-        <details class="asset-help asset-help-row">
-          <summary>美股分类提示</summary>
-          <div>
-            <p>标普500、美国全市场、普通美股 QDII 放在“美国核心宽基”。</p>
-            <p>纳指100、AI、科技成长类基金放在“美股科技卫星”。</p>
-          </div>
-        </details>
-      `
-          : "";
       return `
         <label class="asset-row">
           <span>
@@ -138,7 +126,6 @@ function renderInputs() {
             <select data-currency-id="${asset.id}" aria-label="${asset.name}币种">${currencyOptions}</select>
           </span>
         </label>
-        ${helpRow}
       `;
     })
     .join("");
