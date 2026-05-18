@@ -1,4 +1,4 @@
-import { assetClasses, currencies, defaultAssetCurrencies, emptyAssets, portfolios } from "./data.js";
+import { assetClasses, currencies, defaultAssetCurrencies, emptyAssets, portfolios, returnProfiles } from "./data.js?v=20260518-return-profiles";
 import {
   normalizeInvestableTargetWeights,
   portfolioStats,
@@ -7,13 +7,14 @@ import {
   scenarios,
   sumAssets,
   weightsFromInvestableAssets
-} from "./engine.js";
+} from "./engine.js?v=20260518-return-profiles";
 import { clearSnapshots, deleteSnapshot, loadSnapshots, saveSnapshot } from "./store.js";
 
 const state = {
   assets: createEmptyAssets(),
   assetCurrencies: createDefaultAssetCurrencies(),
   portfolioId: "cnBalanced",
+  returnProfileId: "base",
   snapshots: loadSnapshots()
 };
 
@@ -51,7 +52,9 @@ const nodes = {
   drawdownSelect: document.querySelector("#drawdownSelect"),
   goalSelect: document.querySelector("#goalSelect"),
   recommendBtn: document.querySelector("#recommendBtn"),
-  recommendationResult: document.querySelector("#recommendationResult")
+  recommendationResult: document.querySelector("#recommendationResult"),
+  returnProfileSelect: document.querySelector("#returnProfileSelect"),
+  returnProfileDescription: document.querySelector("#returnProfileDescription")
 };
 
 function createEmptyAssets() {
@@ -104,6 +107,10 @@ function selectedPortfolio() {
   return portfolios.find((portfolio) => portfolio.id === state.portfolioId) || portfolios[0];
 }
 
+function selectedReturnProfile() {
+  return returnProfiles.find((profile) => profile.id === state.returnProfileId) || returnProfiles[1];
+}
+
 function renderInputs() {
   nodes.assetInputs.innerHTML = assetClasses
     .map((asset) => {
@@ -152,7 +159,7 @@ function renderPortfolioCards() {
 
   nodes.portfolioCards.innerHTML = sortedPortfolios
     .map((portfolio) => {
-      const stats = portfolioStats(normalizeInvestableTargetWeights(portfolio.weights));
+      const stats = portfolioStats(normalizeInvestableTargetWeights(portfolio.weights), state.returnProfileId);
       const checked = portfolio.id === state.portfolioId;
       return `
         <button class="portfolio-card" type="button" role="radio" aria-checked="${checked}" data-portfolio-id="${portfolio.id}">
@@ -207,8 +214,9 @@ function renderTarget() {
 function renderSummary() {
   const convertedAssets = convertAssetsToCny(state.assets);
   const total = sumAssets(convertedAssets);
-  const currentStats = portfolioStats(weightsFromInvestableAssets(convertedAssets));
-  const targetStats = portfolioStats(normalizeInvestableTargetWeights(selectedPortfolio().weights));
+  const currentStats = portfolioStats(weightsFromInvestableAssets(convertedAssets), state.returnProfileId);
+  const targetStats = portfolioStats(normalizeInvestableTargetWeights(selectedPortfolio().weights), state.returnProfileId);
+  nodes.returnProfileDescription.textContent = selectedReturnProfile().description;
   nodes.totalAssets.textContent = formatter.format(total);
 
   if (!hasInputAssets()) {
@@ -490,6 +498,12 @@ function bindEvents() {
     const card = event.target.closest("[data-portfolio-id]");
     if (!card) return;
     state.portfolioId = card.dataset.portfolioId;
+    renderPortfolioCards();
+    renderAll();
+  });
+
+  nodes.returnProfileSelect.addEventListener("change", (event) => {
+    state.returnProfileId = event.target.value;
     renderPortfolioCards();
     renderAll();
   });

@@ -1,4 +1,4 @@
-import { assetClasses, groupCorrelation } from "./data.js";
+import { assetClasses, groupCorrelation, returnProfiles } from "./data.js?v=20260518-return-profiles";
 
 const byId = Object.fromEntries(assetClasses.map((asset) => [asset.id, asset]));
 
@@ -47,10 +47,10 @@ export function normalizeInvestableTargetWeights(weights) {
   );
 }
 
-export function portfolioStats(weights) {
+export function portfolioStats(weights, returnProfileId = "base") {
   const fullWeights = normalizeWeights(weights);
   const expectedReturn = assetClasses.reduce((sum, asset) => {
-    return sum + fullWeights[asset.id] * asset.expectedReturn;
+    return sum + fullWeights[asset.id] * expectedReturnFor(asset, returnProfileId);
   }, 0);
 
   let variance = 0;
@@ -71,6 +71,11 @@ export function portfolioStats(weights) {
     volatility,
     score: volatility > 0 ? expectedReturn / volatility : 0
   };
+}
+
+function expectedReturnFor(asset, returnProfileId) {
+  const profile = returnProfiles.find((item) => item.id === returnProfileId);
+  return profile?.expectedReturns?.[asset.id] ?? asset.expectedReturn;
 }
 
 function correlationFor(left, right) {

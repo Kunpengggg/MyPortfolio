@@ -71,6 +71,17 @@
             </div>
             <span id="riskLabel" class="risk-label">-</span>
           </div>
+          <div class="return-profile-control">
+            <label>
+              收益假设
+              <select id="returnProfileSelect">
+                <option value="conservative">保守预测</option>
+                <option value="base" selected>历史中性</option>
+                <option value="techOptimistic">科技乐观</option>
+              </select>
+            </label>
+            <p id="returnProfileDescription">参考长期名义收益和当前模型默认假设，适合作为主视角。</p>
+          </div>
           <div id="diagnosis" class="diagnosis-box"></div>
           <div id="metrics" class="metrics-grid"></div>
           <div id="scenarioTable" class="scenario-table"></div>
@@ -102,7 +113,7 @@
           </div>
           <div class="model-note">
             <strong>模型口径</strong>
-            <span>收益率采用长期名义年化假设：稳健模型偏保守，进取模型更接近历史权益收益，高科技模型把纳指/AI 作为主要收益引擎，但需要承受更大回撤。</span>
+            <span>收益率可在 Step 3 切换为“保守预测 / 历史中性 / 科技乐观”。科技乐观会显著抬高纳指/AI 仓位的预期收益，但也更依赖未来继续高增长。</span>
           </div>
           <div class="recommendation-box" aria-label="帮我选择组合">
             <div class="recommendation-head">
@@ -170,6 +181,6 @@
       </div>
     </main>
 
-    <script type="module" src="src/ui.js"></script>
+    <script type="module" src="src/ui.js?v=20260518-return-profiles"></script>
   </body>
 </html>

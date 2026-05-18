@@ -60,10 +60,20 @@ const incomeVolatility = portfolioStats(normalizeInvestableTargetWeights(portfol
 const growthVolatility = portfolioStats(normalizeInvestableTargetWeights(portfolios.find((item) => item.id === "cnGrowth").weights)).volatility;
 const highReturnVolatility = portfolioStats(normalizeInvestableTargetWeights(portfolios.find((item) => item.id === "cnHighReturn").weights)).volatility;
 const soloMaxStats = portfolioStats(normalizeInvestableTargetWeights(portfolios.find((item) => item.id === "soloMaxGrowth").weights));
+const soloConservativeStats = portfolioStats(
+  normalizeInvestableTargetWeights(portfolios.find((item) => item.id === "soloMaxGrowth").weights),
+  "conservative"
+);
+const soloOptimisticStats = portfolioStats(
+  normalizeInvestableTargetWeights(portfolios.find((item) => item.id === "soloMaxGrowth").weights),
+  "techOptimistic"
+);
 assert.ok(incomeVolatility < growthVolatility, "cash-flow portfolio should be less volatile than growth portfolio");
 assert.ok(growthVolatility <= highReturnVolatility, "high-return portfolio should be at least as volatile as growth portfolio");
 assert.ok(soloMaxStats.expectedReturn >= 0.1, "solo max growth portfolio should show 10%+ expected return under optimistic assumptions");
 assert.ok(highReturnVolatility <= soloMaxStats.volatility, "solo max growth portfolio should be at least as volatile as high-return portfolio");
+assert.ok(soloConservativeStats.expectedReturn < soloMaxStats.expectedReturn, "conservative profile should reduce expected returns");
+assert.ok(soloOptimisticStats.expectedReturn > soloMaxStats.expectedReturn, "tech optimistic profile should increase expected returns");
 
 const balanced = portfolios.find((item) => item.id === "cnBalanced");
 const highReturn = portfolios.find((item) => item.id === "cnHighReturn");

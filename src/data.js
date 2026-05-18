@@ -180,6 +180,56 @@ export const groupCorrelation = {
   other: { cash: 0.05, bonds: 0.12, chinaEquity: 0.4, sectorEquity: 0.42, singleStocks: 0.45, hkEquity: 0.42, usEquity: 0.35, usTechGrowth: 0.35, globalExUsEquity: 0.35, gold: 0.18, reits: 0.35, insurance: 0.1, property: 0.28, other: 1 }
 };
 
+export const returnProfiles = [
+  {
+    id: "conservative",
+    name: "保守预测",
+    description: "更接近机构长期资本市场假设，适合想看偏谨慎结果的人。",
+    expectedReturns: {
+      demandCash: 0.016,
+      moneyFund: 0.018,
+      bonds: 0.032,
+      chinaBroadIndex: 0.055,
+      dividendStrategy: 0.052,
+      sectorFunds: 0.065,
+      singleStocks: 0.075,
+      hkChinaEquity: 0.045,
+      usEquity: 0.07,
+      usTechGrowth: 0.105,
+      globalExUsEquity: 0.05,
+      gold: 0.038,
+      reits: 0.04,
+      pensionInsurance: 0.028,
+      property: 0.015,
+      other: 0.035
+    }
+  },
+  {
+    id: "base",
+    name: "历史中性",
+    description: "参考长期名义收益和当前模型默认假设，适合作为主视角。",
+    expectedReturns: {}
+  },
+  {
+    id: "techOptimistic",
+    name: "科技乐观",
+    description: "假设美股科技和 AI 继续强势，但不代表收益承诺。",
+    expectedReturns: {
+      chinaBroadIndex: 0.08,
+      dividendStrategy: 0.065,
+      sectorFunds: 0.11,
+      singleStocks: 0.13,
+      hkChinaEquity: 0.065,
+      usEquity: 0.12,
+      usTechGrowth: 0.22,
+      globalExUsEquity: 0.06,
+      gold: 0.06,
+      reits: 0.05,
+      other: 0.05
+    }
+  }
+];
+
 export const portfolios = [
   {
     id: "cnStable",
