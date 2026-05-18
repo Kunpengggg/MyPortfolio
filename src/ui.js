@@ -29,6 +29,14 @@ const percentFormatter = new Intl.NumberFormat("zh-CN", {
   maximumFractionDigits: 1
 });
 
+const metricHelp = {
+  名义年化: "不考虑波动拖累的长期平均年收益假设，更像资产配置模型里的平均收益。",
+  复合年化: "考虑波动拖累后的长期复利收益估算，高波动资产通常会低于名义年化。",
+  波动率: "账户上下波动幅度的估算，不是最大亏损。数值越高，短期涨跌越明显。",
+  压力下跌: "用收益和波动估算的压力年份可能下跌幅度，帮助判断自己能不能扛住。",
+  "收益/波动": "每承担一单位波动换来的收益，越高代表风险收益效率越好。"
+};
+
 const nodes = {
   assetInputs: document.querySelector("#assetInputs"),
   totalAssets: document.querySelector("#totalAssets"),
@@ -281,13 +289,33 @@ function comparisonHtml({ currentItems, targetItems, gap }) {
   return `
     <div class="comparison-column">
       <h3>当前配置</h3>
-      ${currentItems.map(([label, value]) => `<div class="metric-card"><span>${label}</span><strong>${value}</strong></div>`).join("")}
+      ${currentItems.map(([label, value]) => metricCardHtml(label, value)).join("")}
     </div>
     <div class="comparison-column target-column">
       <h3>目标配置</h3>
-      ${targetItems.map(([label, value]) => `<div class="metric-card"><span>${label}</span><strong>${value}</strong></div>`).join("")}
+      ${targetItems.map(([label, value]) => metricCardHtml(label, value)).join("")}
     </div>
     <div class="comparison-gap"><span>波动差异</span><strong>${gap}</strong></div>
+  `;
+}
+
+function metricCardHtml(label, value) {
+  const help = metricHelp[label];
+  return `
+    <div class="metric-card">
+      <span class="metric-label">
+        ${label}
+        ${
+          help
+            ? `<details class="info-popover inline-info metric-info">
+                <summary aria-label="${label}说明">i</summary>
+                <p aria-hidden="true">${help}</p>
+              </details>`
+            : ""
+        }
+      </span>
+      <strong>${value}</strong>
+    </div>
   `;
 }
 
