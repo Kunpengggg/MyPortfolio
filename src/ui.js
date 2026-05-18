@@ -309,7 +309,7 @@ function metricCardHtml(label, value) {
           help
             ? `<details class="info-popover inline-info metric-info">
                 <summary aria-label="${label}说明">i</summary>
-                <p aria-hidden="true">${help}</p>
+                <p role="tooltip">${help}</p>
               </details>`
             : ""
         }
@@ -562,6 +562,14 @@ function bindEvents() {
     state.returnProfileId = event.target.value;
     renderPortfolioCards();
     renderAll();
+  });
+
+  document.addEventListener("click", (event) => {
+    document.querySelectorAll("details.info-popover[open]").forEach((details) => {
+      if (!details.contains(event.target)) {
+        details.removeAttribute("open");
+      }
+    });
   });
 
   nodes.recommendBtn.addEventListener("click", applyRecommendation);

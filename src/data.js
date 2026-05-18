@@ -212,8 +212,8 @@ export const returnProfiles = [
   },
   {
     id: "techOptimistic",
-    name: "科技乐观",
-    description: "假设美股科技和 AI 继续强势，但不代表收益承诺。",
+    name: "成长强化",
+    description: "提高美股科技和 AI 成长资产的长期收益假设，但不代表收益承诺。",
     expectedReturns: {
       chinaBroadIndex: 0.08,
       dividendStrategy: 0.065,

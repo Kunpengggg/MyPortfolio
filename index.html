@@ -54,7 +54,7 @@
                 <h3>可投资金融资产</h3>
                 <details class="info-popover">
                   <summary aria-label="可投资金融资产说明">i</summary>
-                  <p aria-hidden="true">只包含现金、固收、基金、股票、黄金、REITs 等可以直接调仓的金融资产；不包含房产、保险、养老金和其他观察项。</p>
+                  <p role="tooltip">只包含现金、固收、基金、股票、黄金、REITs 等可以直接调仓的金融资产；不包含房产、保险、养老金和其他观察项。</p>
                 </details>
               </div>
               <div id="investablePie" class="pie-chart" role="img" aria-label="可投资金融资产占比图"></div>
@@ -77,13 +77,13 @@
                 收益假设
                 <details class="info-popover inline-info">
                   <summary aria-label="收益假设说明">i</summary>
-                  <p aria-hidden="true">用不同市场预期重新计算收益：保守偏机构预测，历史中性用默认长期假设，科技乐观假设纳指/AI 继续强势。</p>
+                  <p role="tooltip">用不同市场预期重新计算收益：保守偏机构预测，历史中性用默认长期假设，成长强化会提高纳指/AI 等成长资产的收益假设。</p>
                 </details>
               </span>
               <select id="returnProfileSelect">
                 <option value="conservative">保守预测</option>
                 <option value="base" selected>历史中性</option>
-                <option value="techOptimistic">科技乐观</option>
+                <option value="techOptimistic">成长强化</option>
               </select>
             </label>
             <p id="returnProfileDescription">参考长期名义收益和当前模型默认假设，适合作为主视角。</p>
@@ -119,7 +119,7 @@
           </div>
           <div class="model-note">
             <strong>模型口径</strong>
-            <span>收益率可在 Step 3 切换为“保守预测 / 历史中性 / 科技乐观”。科技乐观会显著抬高纳指/AI 仓位的预期收益，但也更依赖未来继续高增长。</span>
+            <span>收益率可在 Step 3 切换为“保守预测 / 历史中性 / 成长强化”。成长强化会显著抬高纳指/AI 仓位的预期收益，但也更依赖未来继续高增长。</span>
           </div>
           <div class="recommendation-box" aria-label="帮我选择组合">
             <div class="recommendation-head">
